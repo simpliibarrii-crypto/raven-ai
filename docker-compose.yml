@@ -1,0 +1,24 @@
+# openclinical-ai MVP — single-container deployment for PSW assistant
+# Sovereign by design: data stays on host network. Audit + consent persisted locally.
+version: "3.9"
+
+services:
+  openclinical:
+    build: .
+    container_name: openclinical-ai
+    ports:
+      - "8088:8088"
+    volumes:
+      # Persist audit + consent + tenants outside the container
+      - ./data/audit:/var/lib/openclinical/audit
+      - ./data/consent:/var/lib/openclinical/consent
+      - ./data/tenants:/var/lib/openclinical/tenants
+      # Mount registry as RO so signed manifests can't be tampered at runtime
+      - ./registry:/app/registry:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8088/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
