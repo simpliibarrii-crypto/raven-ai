@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Raven AI logo</title>
+  <desc id="desc">Minimal raven mark with DNA helix and clinical crimson accent.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="72%"><stop offset="0" stop-color="#1E0B12"/><stop offset="1" stop-color="#020305"/></radialGradient>
+    <linearGradient id="red" x1="64" y1="48" x2="420" y2="438"><stop stop-color="#FF334F"/><stop offset="0.48" stop-color="#C8102E"/><stop offset="1" stop-color="#4A0011"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <path d="M161 80 C260 113 302 176 278 256 C342 230 415 260 452 352 C378 312 304 334 226 444 C246 332 195 272 92 230 C178 222 204 144 161 80Z" fill="url(#red)"/>
+  <path d="M208 171 C252 174 272 204 256 235 C292 231 328 250 350 292 C304 272 270 282 224 338 C238 276 198 248 148 234 C198 224 215 196 208 171Z" fill="#05060A" fill-opacity="0.82"/>
+  <circle cx="235" cy="173" r="9" fill="#F4F4F5"/>
+  <g stroke="#D0D7DE" stroke-width="10" stroke-linecap="round" opacity="0.78" filter="url(#glow)">
+    <path d="M94 108 C146 148 54 186 106 226 C158 266 66 302 118 344"/>
+    <path d="M154 108 C102 148 194 186 142 226 C90 266 182 302 130 344"/>
+  </g>
+</svg>
