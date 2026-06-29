@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/simpliibarrii-crypto/raven-ai?style=for-the-badge)](https://github.com/simpliibarrii-crypto/raven-ai/releases/tag/v0.6.0)
 [![License](https://img.shields.io/github/license/simpliibarrii-crypto/raven-ai?style=for-the-badge)](LICENSE)
-[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/simpliibarrii-crypto/raven-ai/main/.github/badges/tests.json&style=for-the-badge)](https://github.com/simpliibarrii-crypto/raven-ai/actions)
+[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/simpliibarrii-crypto/raven-ai/main/.github/badges/tests.json&style=for-the-badge&label=tests)](https://github.com/simpliibarrii-crypto/raven-ai/actions)
 
 **Native American myth-inspired clinical AI agent for healthcare. Raven — the Pacific Northwest creator, trickster, transformer. Open sovereign deployment substrate for biology AI and clinical AI. Multi-tenant by design. Any healthcare service can connect, each tenant stays isolated. Affordable for everyone.**
 
