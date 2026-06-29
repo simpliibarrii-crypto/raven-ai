@@ -1,5 +1,9 @@
 # Raven AI
 
+[![Release](https://img.shields.io/github/v/release/simpliibarrii-crypto/raven-ai?style=for-the-badge)](https://github.com/simpliibarrii-crypto/raven-ai/releases/tag/v0.6.0)
+[![License](https://img.shields.io/github/license/simpliibarrii-crypto/raven-ai?style=for-the-badge)](LICENSE)
+[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/simpliibarrii-crypto/raven-ai/main/.github/badges/tests.json&style=for-the-badge)](https://github.com/simpliibarrii-crypto/raven-ai/actions)
+
 **Native American myth-inspired clinical AI agent for healthcare. Raven — the Pacific Northwest creator, trickster, transformer. Open sovereign deployment substrate for biology AI and clinical AI. Multi-tenant by design. Any healthcare service can connect, each tenant stays isolated. Affordable for everyone.**
 
 Apache 2.0 · [github.com/simpliibarrii-crypto/raven-ai](https://github.com/simpliibarrii-crypto/raven-ai)
@@ -15,6 +19,7 @@ An open-source runtime for deploying clinical AI models (and biology AI models) 
 - **Multi-tenant by design** — any healthcare service can connect, each tenant isolated with its own encryption keys, audit log, consent records, and rate limits.
 - **Bring Your Own Key (BYOK)** — tenants bring their own KMS key (AWS KMS, Azure Key Vault, GCP KMS, HashiCorp Vault). openclinical-ai cannot decrypt PHI without tenant permission.
 - **Signed model registry** — every model artifact is Ed25519-signed; unsigned models rejected by default.
+- **Agentic adapter** — `AgenticAdapter` for frontier models with tool calling, web search, PubMed, DrugBank, sequence analysis.
 - **Audit gateway** — every inference logged in FHIR AuditEvent-compatible format, tenant-scoped.
 - **Consent engine** — PHIPA-aligned opt-in consent, propagated to every call.
 - **Prompt-injection defense** — PSW free-text notes sanitized for 20+ injection patterns before AI inference. OWASP LLM01:2025 covered.
