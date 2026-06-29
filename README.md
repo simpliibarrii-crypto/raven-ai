@@ -1,8 +1,8 @@
-# openclinical-ai
+# Raven AI
 
-**The hub of AI for healthcare and biology — open sovereign deployment substrate for biology AI and clinical AI. Multi-tenant by design. Any healthcare service can connect, each tenant stays isolated. Affordable for everyone.**
+**Native American myth-inspired clinical AI agent for healthcare. Raven — the Pacific Northwest creator, trickster, transformer. Open sovereign deployment substrate for biology AI and clinical AI. Multi-tenant by design. Any healthcare service can connect, each tenant stays isolated. Affordable for everyone.**
 
-Apache 2.0 · [github.com/simpliibarrii-crypto/openclinical-ai](https://github.com/simpliibarrii-crypto/openclinical-ai)
+Apache 2.0 · [github.com/simpliibarrii-crypto/raven-ai](https://github.com/simpliibarrii-crypto/raven-ai)
 **Runs on macOS, Windows, Linux (Ubuntu/Debian, Fedora/RHEL, Arch, Alpine), iOS, Android — browser + Python 3.11+ anywhere.**
 
 ---
