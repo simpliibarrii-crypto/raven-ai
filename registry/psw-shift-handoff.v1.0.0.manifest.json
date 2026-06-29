@@ -1,0 +1,30 @@
+{
+  "id": "psw-shift-handoff",
+  "version": "1.0.0",
+  "model_type": "clinical-heuristic",
+  "description": "PSW shift-handoff documentation assistant. Captures vitals, mobility, intake/output, mood, incidents, family contact events. Heuristic categorization + concern detection + summary generation.",
+  "card": {
+    "id": "psw-shift-handoff",
+    "version": "1.0.0",
+    "model_type": "clinical-heuristic",
+    "description": "PSW shift-handoff documentation assistant (heuristic MVP).",
+    "intended_use": "Personal Support Workers (PSWs) in long-term care and retirement home settings to document end-of-shift handoffs via voice or structured input. Generates FHIR-compatible structured observations and a human-readable summary.",
+    "training_data": "MVP uses deterministic heuristics (no ML training). Future versions will be fine-tuned on anonymized PSW shift notes.",
+    "evaluation_metrics": {
+      "mvp_validation": "manual review by Brian Clerjuste, PSW with 10 years experience",
+      "next_milestone": "pilot at Gary J Armstrong Retirement Home"
+    },
+    "ethical_considerations": "Designed for augmenting \u2014 not replacing \u2014 PSW judgment. All outputs require PSW review before being included in the clinical record. Patient consent is required before any processing. Audit trail captures every inference.",
+    "clinical_validation": "Pre-clinical validation. Real clinical validation requires pilot deployment with ethics board approval.",
+    "phipa_compliance": "PHIPA-aligned: opt-in consent, audit trail, data minimization, purpose-limited processing.",
+    "license": "Apache-2.0"
+  },
+  "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "artifact_size_bytes": 0,
+  "created_at": "2026-06-29T01:35:00Z",
+  "signature": {
+    "key_id": "default",
+    "algorithm": "ed25519",
+    "value": "24f44c0e3718f50bab0736daa151e979ef4601e38c257e05351807d3e5fa264bbef13a2a60d89ed98b21c87c95e90c2e8b82c54f13fb4be64ed77994c22a6000"
+  }
+}
