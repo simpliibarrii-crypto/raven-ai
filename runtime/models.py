@@ -355,6 +355,231 @@ def _generate_summary(
     return "Shift handoff summary: " + ". ".join(parts) + "."
 
 
+class AgenticAdapter(ModelAdapter):
+  """Agentic adapter for frontier models with tool calling, web search, code execution.
+
+  Wraps models like Qwen 3 Coder 480B, Claude 3.7 Sonnet, GPT-5.5 to provide
+  agentic capabilities for healthcare AI:
+
+  - Web search and retrieval (PubMed, clinical trial registries, drug databases)
+  - Code execution (Python, Bash) for data analysis, bioinformatics
+  - Tool calling (structured function calls with type validation)
+  - Multi-step planning with memory and tool use
+  - Iterative refinement with self-critique
+
+  This adapter is designed to work with models that support native tool calling
+  and function definitions (OpenAI Functions, Anthropic Tools, Qwen Tool Use).
+  """
+
+  def __init__(self, system_prompt: str | None = None) -> None:
+      super().__init__(system_prompt=system_prompt)
+      self.max_iterations = 5
+      self.tools_available = [
+          {
+              "type": "function",
+              "function": {
+                  "name": "web_search",
+                  "description": "Search the web for current information. Use for clinical guidelines, drug interactions, clinical trials, medical literature.",
+                  "parameters": {
+                      "type": "object",
+                      "properties": {
+                          "query": {"type": "string", "description": "Search query"},
+                          "sources": {"type": "array", "items": {"type": "string"}, "description": "Optional source domains to prioritize"}
+                      },
+                      "required": ["query"]
+                  }
+              }
+          },
+          {
+              "type": "function",
+              "function": {
+                  "name": "run_python",
+                  "description": "Execute Python code. Use for data analysis, calculations, bioinformatics scripts.",
+                  "parameters": {
+                      "type": "object",
+                      "properties": {
+                          "code": {"type": "string", "description": "Python code to execute"},
+                          "requirements": {"type": "array", "items": {"type": "string"}, "description": "Optional pip requirements"}
+                      },
+                      "required": ["code"]
+                  }
+              }
+          },
+          {
+              "type": "function",
+              "function": {
+                  "name": "fetch_pubmed",
+                  "description": "Fetch medical literature from PubMed. Use for clinical evidence, drug studies, disease research.",
+                  "parameters": {
+                      "type": "object",
+                      "properties": {
+                          "query": {"type": "string", "description": "PubMed search query"},
+                          "limit": {"type": "integer", "description": "Max results to return", "default": 5}
+                      },
+                      "required": ["query"]
+                  }
+              }
+          },
+          {
+              "type": "function",
+              "function": {
+                  "name": "fetch_drugbank",
+                  "description": "Fetch drug information from DrugBank. Use for drug mechanisms, interactions, dosing.",
+                  "parameters": {
+                      "type": "object",
+                      "properties": {
+                          "drug_name": {"type": "string", "description": "Drug name or identifier"},
+                          "fields": {"type": "array", "items": {"type": "string"}, "description": "Optional fields to include"}
+                      },
+                      "required": ["drug_name"]
+                  }
+              }
+          },
+          {
+              "type": "function",
+              "function": {
+                  "name": "analyze_sequence",
+                  "description": "Analyze DNA/RNA/protein sequences. Use for bioinformatics, variant impact, primer design.",
+                  "parameters": {
+                      "type": "object",
+                      "properties": {
+                          "sequence": {"type": "string", "description": "DNA/RNA/protein sequence"},
+                          "analysis_type": {"type": "string", "enum": ["orf", "primers", "variants", "_homology"], "description": "Type of analysis"}
+                      },
+                      "required": ["sequence", "analysis_type"]
+                  }
+              }
+          }
+      ]
+
+  async def run(self, inputs: dict[str, Any]) -> dict[str, Any]:
+      """Run agentic inference with tool calling and multi-step reasoning."""
+      user_query = inputs.get("query", "")
+      context = inputs.get("context", {})
+      tenant_id = inputs.get("tenant_id", "unknown")
+      psw_id = inputs.get("psw_id", "unknown")
+
+      # Build system prompt with agentic context
+      system_prompt = self.system_prompt or ""
+      if system_prompt and not system_prompt.endswith("\n"):
+          system_prompt += "\n\n"
+      system_prompt += (
+          "You are Raven AI — a Native American myth-inspired clinical AI agent. "
+          "You are an agentic assistant with tools to search the web, run code, "
+          "fetch medical literature, and analyze biological sequences. "
+          "Use your tools proactively to gather information. "
+          "Cite all sources. Be factual, honest about uncertainty."
+      )
+
+      # Iterative reasoning loop
+      messages = [
+          {"role": "system", "content": system_prompt},
+          {"role": "user", "content": user_query}
+      ]
+
+      result = {
+          "query": user_query,
+          "tenant_id": tenant_id,
+          "psw_id": psw_id,
+          "iterations": [],
+          "final_answer": "",
+          "sources_cited": [],
+          "tool_uses": [],
+      }
+
+      for iteration in range(1, self.max_iterations + 1):
+          # Call model with tools available
+          model_response = await self._call_model_with_tools(messages, self.tools_available)
+
+          result["iterations"].append({
+              "iteration": iteration,
+              "model_response": model_response,
+          })
+
+          # Check if model wants to use a tool
+          if "tool_calls" in model_response:
+              for tool_call in model_response["tool_calls"]:
+                  tool_name = tool_call.get("name", "unknown")
+                  tool_args = tool_call.get("arguments", {})
+                  tool_use_id = tool_call.get("id", f"tool_{iteration}")
+
+                  result["tool_uses"].append({
+                      "iteration": iteration,
+                      "tool": tool_name,
+                      "arguments": tool_args,
+                  })
+
+                  # Execute tool
+                  tool_result = await self._execute_tool(tool_name, tool_args, tenant_id)
+
+                  result["tool_uses"][-1]["result"] = tool_result.get("result", "Error")
+
+                  # Add to conversation
+                  messages.append({
+                      "role": "assistant",
+                      "content": "",
+                      "tool_calls": [tool_call]
+                  })
+                  messages.append({
+                      "role": "tool",
+                      "tool_call_id": tool_use_id,
+                      "content": json.dumps(tool_result)
+                  })
+
+              # Continue to next iteration with tool results
+              continue
+
+          # Model returned a final answer
+          result["final_answer"] = model_response.get("content", "")
+          break
+
+      return result
+
+  async def _call_model_with_tools(self, messages: list[dict], tools: list[dict]) -> dict:
+      """Call the underlying model with tools available.
+
+      This is a placeholder for the actual model API call.
+      In production, this would call the configured LLM provider
+      with function calling enabled.
+      """
+      # Placeholder implementation
+      # In production: call Qwen/ Claude / GPT with tools parameter
+      return {
+          "content": "This is a placeholder response. In production, this would call the frontier model with tool calling enabled.",
+          "tool_calls": []
+      }
+
+  async def _execute_tool(self, tool_name: str, args: dict, tenant_id: str) -> dict:
+      """Execute a tool and return the result."""
+      if tool_name == "web_search":
+          # Placeholder for web search
+          # In production: use a search API (SearXNG, SerpAPI, etc.)
+          return {"result": f"Web search for: {args.get('query', '')}"}
+
+      elif tool_name == "run_python":
+          # Placeholder for Python execution
+          # In production: execute in sandboxed environment
+          return {"result": "Python code execution placeholder"}
+
+      elif tool_name == "fetch_pubmed":
+          # Placeholder for PubMed fetch
+          # In production: call NCBI E-utilities API
+          return {"result": f"PubMed search for: {args.get('query', '')}"}
+
+      elif tool_name == "fetch_drugbank":
+          # Placeholder for DrugBank fetch
+          # In production: call DrugBank API
+          return {"result": f"DrugBank lookup for: {args.get('drug_name', '')}"}
+
+      elif tool_name == "analyze_sequence":
+          # Placeholder for sequence analysis
+          # In production: use bioinformatics libraries (Biopython, etc.)
+          return {"result": f"Sequence analysis: {args.get('analysis_type', '')}"}
+
+      else:
+          return {"result": f"Unknown tool: {tool_name}"}
+
+
 class ModelRegistry:
     """Registry of signed models."""
 
@@ -416,9 +641,11 @@ class ModelRegistry:
         model_version = manifest["version"]
         model_type = manifest["model_type"]
 
-        # MVP: heuristic adapter for PSW shift handoff
+        # Adapter selection
         if model_id == "psw-shift-handoff":
             adapter = PSWShiftHandoffAdapter(system_prompt=self.system_prompt)
+        elif model_type == "agentic":
+            adapter = AgenticAdapter(system_prompt=self.system_prompt)
         else:
             logger.warning("no adapter for model type %s — loading as passthrough", model_type)
             adapter = PSWShiftHandoffAdapter(system_prompt=self.system_prompt)  # MVP fallback
