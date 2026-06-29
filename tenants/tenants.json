@@ -1,0 +1,74 @@
+{
+  "tenants": [
+    {
+      "id": "bayshore-ottawa",
+      "name": "Bayshore Home Health \u2014 Ottawa",
+      "encryption_model": "agency-byok",
+      "api_key_hash": "fffceda41b02d22cf5509c3acee4099f890d4c1cdd2a0557003c496c801100ab",
+      "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:111122223333:key/bayshore-ottawa",
+      "contact_email": "ops-ottawa@bayshore.ca",
+      "created_at": "2026-06-29T00:00:00Z",
+      "metadata": {
+        "province": "ON",
+        "city": "Ottawa"
+      },
+      "tier": "home_care_agency"
+    },
+    {
+      "id": "carefor-ottawa",
+      "name": "Carefor Health & Community Services",
+      "encryption_model": "agency-byok",
+      "api_key_hash": "b15ddb209eecc57c7bd94233eb6d26c05b1a5eae57116b67d4705e3755c5bc4d",
+      "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:444455556666:key/carefor-ottawa",
+      "contact_email": "it@carefor.ca",
+      "created_at": "2026-06-29T00:00:00Z",
+      "metadata": {
+        "province": "ON",
+        "city": "Ottawa"
+      },
+      "tier": "home_care_agency"
+    },
+    {
+      "id": "vha-toronto",
+      "name": "VHA Home HealthCare",
+      "encryption_model": "platform-managed",
+      "api_key_hash": "0ede2585eb737cfb990149bcd4f749b1c09174061c3ae2a593e5a4424422f488",
+      "byok_key_ref": null,
+      "contact_email": "tech@vha.ca",
+      "created_at": "2026-06-29T00:00:00Z",
+      "metadata": {
+        "province": "ON",
+        "city": "Toronto"
+      },
+      "tier": "home_care_agency"
+    },
+    {
+      "id": "gary-j-armstrong",
+      "name": "Garry J. Armstrong Retirement Home",
+      "encryption_model": "agency-byok",
+      "api_key_hash": "9b3c4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d",
+      "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:777788889999:key/gary-j-armstrong",
+      "contact_email": "admin@gjah.ca",
+      "created_at": "2026-06-29T00:00:00Z",
+      "metadata": {
+        "province": "ON",
+        "city": "Ottawa"
+      },
+      "tier": "ltc_home"
+    },
+    {
+      "id": "toh-academic",
+      "name": "The Ottawa Hospital \u2014 Academic",
+      "encryption_model": "agency-byok",
+      "api_key_hash": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+      "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:aaaabbbbcccc:key/toh-academic",
+      "contact_email": "ai-research@toh.ca",
+      "created_at": "2026-06-29T00:00:00Z",
+      "metadata": {
+        "province": "ON",
+        "city": "Ottawa"
+      },
+      "tier": "academic_medical_center"
+    }
+  ]
+}
