@@ -1,0 +1,11 @@
+{
+  "patient_id": "default-psw-brian",
+  "status": "active",
+  "scope": [
+    "*"
+  ],
+  "granted_by": "psw-brian",
+  "created_at": "2026-06-29T02:30:42Z",
+  "expires_at": null,
+  "token": "d984833d-f61f-4639-a491-45a52cf461fc"
+}
