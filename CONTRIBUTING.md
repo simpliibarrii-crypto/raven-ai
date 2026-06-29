@@ -1,51 +1,30 @@
-# Contributing to openclinical-ai
+# Contributing
 
-Thanks for your interest in contributing. This project is built by frontline Canadian healthcare workers + AI engineers + sovereign-infrastructure advocates.
+Thanks for helping improve the Raven ecosystem.
 
-## How to contribute
+## Before opening a pull request
 
-1. **Issues** — file a GitHub issue for bugs, missing features, or research questions.
-2. **Pull requests** — fork the repo, make focused changes, submit a PR.
-3. **CLA** — all contributions require a Contributor License Agreement. This protects both contributors and the open-source license. Email `bclerjuste@gmail.com` to get the CLA.
-4. **Code review** — all PRs require review from a maintainer.
+1. Open or reference an issue for substantial changes.
+2. Keep changes focused and reviewable.
+3. Add tests or explain why tests are not applicable.
+4. Update documentation when behavior changes.
+5. Consider security, privacy, and reproducibility impact.
 
-## Areas where contributions are especially welcome
+## Development workflow
 
-- **Biology AI adapters** — protein folding, variant effect prediction, RNA structure, drug-target interaction
-- **Clinical NLP adapters** — PSW note structuring, clinical documentation, multilingual support (FR/EN priority)
-- **FHIR integration** — Consent resource, AuditEvent, Patient, Observation
-- **Adversarial-robustness CI** — red-teaming pipelines, prompt-injection detection, input sanitization
-- **Edge deployment** — Jetson Orin, Coral, Hailo, Raspberry Pi inference
-- **Compliance** — PHIPA, PIPEDA, EU AI Act, FDA PCCP mapping
-- **Documentation** — translations (especially French Canadian), tutorials, case studies
-
-## Coding standards
-
-- Python 3.10+ with type hints
-- `ruff` for linting, `black` for formatting (config to come)
-- `pytest` for tests — PRs without tests will be reviewed but may be held
-- Apache 2.0 license headers on all new files
-
-## Commit message format
-
-```
-<scope>: <short description>
-
-<longer description>
-
-Refs: <issue or research doc>
+```bash
+git checkout -b feature/short-description
+# make changes
+pytest -q || true
+npm test --if-present || true
+cargo test || true
 ```
 
-Examples:
-- `runtime: add consent revocation endpoint`
-- `psw-ui: support French Canadian voice input`
-- `biology-ai: scaffold protein-fold adapter`
-- `docs: update THREAT-MODEL.md with prompt-injection analysis`
+Use the relevant commands for the repository stack.
 
-## Code of conduct
+## Standards
 
-This is a healthcare project. Be respectful, professional, and patient-first. We are building infrastructure that affects real people's lives.
-
----
-
-Questions? Email `bclerjuste@gmail.com` or open a GitHub discussion.
+- Be explicit about assumptions.
+- Keep clinical and biological claims bounded and evidence-linked.
+- Avoid hidden telemetry, hardcoded credentials, and unreviewed network calls.
+- Prefer small, composable modules over large opaque abstractions.
