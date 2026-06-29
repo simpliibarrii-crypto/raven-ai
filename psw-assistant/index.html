@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#c8102e">
+<meta name="description" content="openclinical-ai — sovereign clinical AI for home care. Multi-tenant. Voice-first. Equity-first.">
+<title>openclinical-ai — Home Care Visit Assistant</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+</head>
+<body>
+
+<!-- ===== Header: brand + quick actions ===== -->
+<header>
+  <div class="brand">
+    <img class="brand-logo" src="assets/logo.svg" alt="openclinical-ai logo" width="36" height="36">
+    <div>
+      <h1 data-i18n="app.name">openclinical-ai</h1>
+      <p class="tagline" data-i18n="app.subtagline">the hub of AI for healthcare & biology · Apache 2.0</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="server-dot" class="status-dot status-unknown" title="checking…"></span>
+    <button id="theme-toggle" class="header-btn" title="Toggle theme" aria-label="Toggle light/dark mode">☀</button>
+  </div>
+</header>
+
+<!-- ===== Main content ===== -->
+<main>
+
+  <!-- === Visits tab === -->
+  <div class="tab-panel active" id="panel-visits">
+
+    <!-- Sign-in card -->
+    <section class="card" id="setup-card">
+      <h2 data-i18n="setup.title">Sign in to your agency</h2>
+      <p class="hint" data-i18n="setup.hint">Multi-tenant. Pick your agency, sign in with your agency credentials.</p>
+
+      <div class="field">
+        <label for="tenant-select" data-i18n="setup.agency">Healthcare agency / tenant</label>
+        <select id="tenant-select"><option value="" data-i18n="setup.loading">loading agencies</option></select>
+      </div>
+
+      <div class="field">
+        <label data-i18n="setup.encryption">Encryption model</label>
+        <div class="encryption-model">
+          <span id="encryption-text" data-i18n="setup.byok">agency BYOK — agency-held encryption keys</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="psw-id" data-i18n="setup.psw_id">Caregiver / PSW ID</label>
+        <input id="psw-id" placeholder="psw-brian" value="psw-brian">
+      </div>
+
+      <div class="field">
+        <label for="auth-method" data-i18n="setup.auth_method">Sign-in method</label>
+        <select id="auth-method">
+          <option value="password" data-i18n="setup.password">Password + MFA</option>
+          <option value="oidc" data-i18n="setup.oidc">Agency SSO (OIDC)</option>
+          <option value="magic" data-i18n="setup.magic">Magic link</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="runtime-url" data-i18n="setup.runtime_url">Runtime URL</label>
+        <input id="runtime-url" value="http://localhost:8088">
+      </div>
+
+      <div class="field">
+        <label for="facility-id" data-i18n="setup.facility">Facility ID</label>
+        <input id="facility-id" placeholder="e.g. gja-main" value="gja-main">
+      </div>
+
+      <div class="field">
+        <label for="floor-id" data-i18n="setup.floor">Floor</label>
+        <select id="floor-id">
+          <option value="">— none —</option>
+          <option value="2F">2F — Dementia (Margaret O'Donnell, Jean-Paul Tremblay, Harold Chen)</option>
+          <option value="3F">3F — Dementia (Betty Williams, Frank Kowalski)</option>
+        </select>
+      </div>
+
+      <button id="signin-btn" class="primary" data-i18n="setup.signin">Sign in & load my visits</button>
+      <div id="setup-message" class="message hidden"></div>
+    </section>
+
+    <!-- Call bell notification bar -->
+    <section class="card hidden" id="callbell-notification">
+      <div class="callbell-banner">
+        <span class="callbell-alert-icon">🔔</span>
+        <div class="callbell-content">
+          <div class="callbell-header" id="callbell-msg">Call bell alert</div>
+          <div class="callbell-detail" id="callbell-detail"></div>
+        </div>
+        <button id="callbell-dismiss" class="secondary small">✕</button>
+      </div>
+    </section>
+
+    <!-- Today's visits -->
+    <section class="card hidden" id="today-card">
+      <h2 data-i18n="today.title">Today's visits — <span id="psw-label"></span></h2>
+      <p class="hint" data-i18n="today.hint">Voice-first. Tap a visit to start documentation.</p>
+      <div id="visit-list" class="visit-list"></div>
+      <div class="actions">
+        <button id="refresh-visits-btn" class="secondary" data-i18n="today.refresh">Refresh</button>
+      </div>
+    </section>
+
+    <!-- Visit in progress -->
+    <section class="card hidden" id="visit-card">
+      <h2 data-i18n="visit.title">Visit in progress — <span id="visit-client-label"></span></h2>
+      <div class="visit-banner">
+        <div class="visit-meta">
+          <span class="visit-time" id="visit-clock-time">00:00:00</span>
+          <span class="badge in-progress" id="visit-status-badge" data-i18n="visit.in_progress">in-progress</span>
+        </div>
+        <div class="visit-meta-secondary">
+          <span id="visit-address"></span>
+          <span id="visit-gps"></span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field"><label data-i18n="visit.bp">BP</label><input id="bp" type="text" inputmode="numeric" placeholder="120/80"></div>
+        <div class="field"><label data-i18n="visit.hr">HR</label><input id="hr" type="number" inputmode="numeric" placeholder="72"></div>
+        <div class="field"><label data-i18n="visit.temp">Temp</label><input id="temp" type="number" step="0.1" inputmode="decimal" placeholder="36.8"></div>
+        <div class="field"><label data-i18n="visit.spo2">SpO2</label><input id="spo2" type="number" inputmode="numeric" placeholder="97"></div>
+        <div class="field"><label data-i18n="visit.pain">Pain</label><input id="pain" type="number" min="0" max="10" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label data-i18n="visit.meal">Intake</label><input id="meal" type="number" min="0" max="100" inputmode="numeric" placeholder="75"></div>
+        <div class="field wide"><label data-i18n="visit.ambulation">Ambulation</label><input id="ambulation" type="text" placeholder="e.g. walked 10m to kitchen with cane"></div>
+        <div class="field wide"><label data-i18n="visit.mood">Mood</label><input id="mood" type="text" placeholder="e.g. alert, oriented x3, calm"></div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="visit.notes">Visit notes</label>
+        <textarea id="notes" rows="4" data-i18n-placeholder="visit.notes_placeholder">Tap mic to dictate, or type…</textarea>
+        <div class="voice-controls">
+          <button id="voice-btn" class="voice" aria-label="Start voice input">🎙 <span id="voice-btn-text" data-i18n="visit.start_dictation">Start dictation</span></button>
+          <span id="voice-status" class="voice-status"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="visit.family_note">Family-visible note (optional)</label>
+        <textarea id="family-visible" rows="2" data-i18n-placeholder="visit.family_note_placeholder">Optional plain-language summary…</textarea>
+      </div>
+
+      <button id="complete-visit-btn" class="primary" data-i18n="visit.complete">Complete visit</button>
+      <div id="visit-message" class="message hidden"></div>
+    </section>
+
+    <!-- Result -->
+    <section class="card hidden" id="result-card">
+      <h2 data-i18n="result.title">Visit summary — <span id="result-client-label"></span></h2>
+      <div id="result-content"></div>
+      <button id="next-visit-btn" class="primary" data-i18n="result.next">Next visit</button>
+    </section>
+
+    <!-- Audit -->
+    <section class="card hidden" id="audit-card">
+      <h2 data-i18n="audit.title">Recent audit events</h2>
+      <p class="hint" data-i18n="audit.hint">Every inference + consent decision is logged.</p>
+      <div id="audit-content"></div>
+    </section>
+  </div>
+
+  <!-- === Connect tab === -->
+  <div class="tab-panel" id="panel-connect">
+    <section class="card">
+      <h2 data-i18n="connectors.title">Healthcare Connectors</h2>
+      <p class="hint" data-i18n="connectors.hint">All major healthcare and biotech systems can connect to openclinical-ai. Honest statuses below.</p>
+      <div id="connector-grid" class="connector-grid"></div>
+    </section>
+
+    <section class="card">
+      <div class="portal-hero">
+        <h2 data-i18n="business.hero">Enterprise onboarding for healthcare & biotech</h2>
+        <p data-i18n="business.hero_desc">Multi-billion dollar companies connect just as simply as small home care agencies. Same equity-first platform. Same transparency.</p>
+      </div>
+
+      <div class="portal-step">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong data-i18n="business.step1_title">Register your organization</strong><span data-i18n="business.step1_desc">Fill out the form below. We'll provision your tenant within 24 hours.</span></div>
+      </div>
+      <div class="portal-step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong data-i18n="business.step2_title">Choose your integration</strong><span data-i18n="business.step2_desc">FHIR R4, HL7v2, custom webhooks, or direct API. 15+ connectors.</span></div>
+      </div>
+      <div class="portal-step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong data-i18n="business.step3_title">Deploy & train your team</strong><span data-i18n="business.step3_desc">Single-container Docker deploy or on-prem air-gapped. PSW voice UI works on any device.</span></div>
+      </div>
+
+      <h3 style="margin-top:1.5rem">Apply now</h3>
+      <div class="field"><label data-i18n="business.form_org">Organization name</label><input id="biz-org" placeholder="e.g. Bayshore Home Health"></div>
+      <div class="field"><label data-i18n="business.form_email">Contact email</label><input id="biz-email" type="email" placeholder="ops@agency.ca"></div>
+      <div class="field">
+        <label data-i18n="business.form_type">Organization type</label>
+        <select id="biz-type">
+          <option value="home_care_agency" data-i18n="business.form_type_homecare">Home Care Agency</option>
+          <option value="regional_hospital" data-i18n="business.form_type_hospital">Hospital / Health System</option>
+          <option value="ltc_home" data-i18n="business.form_type_ltc">Long-Term Care / Retirement</option>
+          <option value="biotech_research" data-i18n="business.form_type_biotech">Biotech / Pharma</option>
+          <option value="other" data-i18n="business.form_type_other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label data-i18n="business.form_tier">Estimated volume</label>
+        <select id="biz-tier">
+          <option value="low" data-i18n="business.form_tier_low">< 100 inferences/day</option>
+          <option value="medium" data-i18n="business.form_tier_medium">100-1000 inferences/day</option>
+          <option value="high" data-i18n="business.form_tier_high">1000+ inferences/day</option>
+        </select>
+      </div>
+      <button id="biz-submit" class="primary" data-i18n="business.form_submit">Submit application</button>
+      <div id="biz-message" class="message hidden"></div>
+    </section>
+  </div>
+
+  <!-- === Biology News tab === -->
+  <div class="tab-panel" id="panel-news">
+    <section class="card">
+      <h2 data-i18n="news.title">Biology & Biotech News</h2>
+      <p class="hint" data-i18n="news.hint">Global biology and biotechnology news. Top stories, companies to watch, and what to look forward to. Curated daily.</p>
+    </section>
+
+    <!-- Top Stories -->
+    <section class="card">
+      <h3 data-i18n="news.top_stories">Top Stories</h3>
+      <div id="news-stories" class="news-feed"></div>
+    </section>
+
+    <!-- Companies to Watch -->
+    <section class="card">
+      <h3 data-i18n="news.companies">Companies to Watch</h3>
+      <div id="news-companies" class="company-grid"></div>
+    </section>
+
+    <!-- What to Look Forward To -->
+    <section class="card">
+      <h3 data-i18n="news.upcoming">What to Look Forward To</h3>
+      <div id="news-upcoming" class="news-feed"></div>
+    </section>
+  </div>
+
+  <!-- === Settings tab === -->
+  <div class="tab-panel" id="panel-settings">
+    <section class="card">
+      <h2 data-i18n="settings.title">Settings</h2>
+
+      <div class="settings-group">
+        <h3 data-i18n="settings.appearance">Appearance</h3>
+        <div class="setting-row">
+          <span class="setting-label" data-i18n="settings.theme">Theme</span>
+          <div class="setting-choice">
+            <button data-theme-choice="light" class="active" data-i18n="settings.theme_light">Light</button>
+            <button data-theme-choice="dark" data-i18n="settings.theme_dark">Dark</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label" data-i18n="settings.language">Language</span>
+          <div class="setting-choice">
+            <button data-lang-choice="en" class="active">English</button>
+            <button data-lang-choice="fr">Français</button>
+            <button data-lang-choice="es">Español</button>
+            <button data-lang-choice="zh">中文</button>
+            <button data-lang-choice="ar">العربية</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3 data-i18n="settings.about">About</h3>
+        <div class="setting-row">
+          <span class="setting-label" data-i18n="settings.version">Version</span>
+          <span style="color:var(--text-muted);font-family:monospace">0.4.0</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label" data-i18n="settings.license">License</span>
+          <span style="color:var(--text-muted)">Apache 2.0</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label" data-i18n="settings.repo">GitHub</span>
+          <a href="https://github.com/simpliibarrii-crypto/openclinical-ai" target="_blank" rel="noopener">simpliibarrii-crypto/openclinical-ai</a>
+        </div>
+      </div>
+
+      <button id="settings-signout" class="secondary" data-i18n="settings.signout">Sign out</button>
+    </section>
+  </div>
+
+</main>
+
+<!-- ===== Bottom tab bar (mobile-first, minimal buttons) ===== -->
+<nav class="tabs" id="tab-bar">
+  <button class="active" data-tab="visits">
+    <span class="tab-icon">🏠</span>
+    <span data-i18n="tab.visits">Visits</span>
+  </button>
+  <button data-tab="connect">
+    <span class="tab-icon">🔗</span>
+    <span data-i18n="tab.connect">Connect</span>
+  </button>
+  <button data-tab="news">
+    <span class="tab-icon">🧬</span>
+    <span data-i18n="tab.news">News</span>
+  </button>
+  <button data-tab="settings">
+    <span class="tab-icon">⚙</span>
+    <span data-i18n="tab.settings">Settings</span>
+  </button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
