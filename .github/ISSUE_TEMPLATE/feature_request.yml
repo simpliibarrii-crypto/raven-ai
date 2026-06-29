@@ -1,0 +1,37 @@
+name: Feature request
+description: Propose a focused improvement
+labels: [enhancement, triage]
+body:
+  - type: input
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: What workflow or user need does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - agentic-ai
+        - computational-biology
+        - healthcare-ai
+        - orchestration
+        - documentation
+        - security
+        - developer-experience
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence, references, or prior art
+    validations:
+      required: false
