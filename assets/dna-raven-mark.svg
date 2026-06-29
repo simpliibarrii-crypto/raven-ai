@@ -1,0 +1,11 @@
+<svg width="900" height="260" viewBox="0 0 900 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">DNA Raven identity mark</title><desc id="desc">Raven silhouette and DNA helix for Raven AI visual identity.</desc>
+<defs><linearGradient id="r" x1="0" y1="0" x2="900" y2="260"><stop stop-color="#C8102E"/><stop offset="1" stop-color="#8B949E"/></linearGradient></defs>
+<rect width="900" height="260" rx="32" fill="#05060A"/>
+<g opacity=".26" stroke="url(#r)" stroke-width="2">
+<path d="M82 34 C166 84 42 130 126 178 C210 226 86 230 170 256"/><path d="M190 34 C106 84 230 130 146 178 C62 226 186 230 102 256"/>
+<line x1="92" y1="57" x2="180" y2="57"/><line x1="70" y1="97" x2="204" y2="97"/><line x1="88" y1="138" x2="186" y2="138"/><line x1="104" y1="180" x2="170" y2="180"/><line x1="83" y1="222" x2="188" y2="222"/></g>
+<path d="M648 38 C746 66 782 136 754 196 C808 184 850 204 874 246 C804 224 736 228 666 248 C682 198 640 162 574 140 C632 132 670 88 648 38Z" fill="url(#r)" opacity=".84"/>
+<text x="294" y="112" fill="#F4F4F5" font-family="Avenir Next, Segoe UI, sans-serif" font-size="44" font-weight="800" letter-spacing="3">RAVEN AI</text>
+<text x="298" y="154" fill="#9DA7B3" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">biology-native agents · clinical governance · reproducible workflows</text>
+</svg>
