@@ -1,0 +1,21 @@
+{
+  "name": "openclinical-ai — Home Care Visit Assistant",
+  "short_name": "openclinical-ai",
+  "description": "Sovereign clinical AI for home care. Multi-tenant. Voice-first. Equity-first.",
+  "start_url": "/psw/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#c8102e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical", "productivity"],
+  "lang": "en",
+  "dir": "ltr"
+}
