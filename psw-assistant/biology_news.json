@@ -1,0 +1,139 @@
+{
+  "updated": "2026-06-28T23:50:00Z",
+  "source": "curated — live RSS/API aggregation coming in v0.5.0",
+  "top_stories": [
+    {
+      "title": "DeepMind's AlphaFold3 now predicts protein-DNA interactions at atomic resolution",
+      "source": "Nature Biotechnology",
+      "date": "2026-06-25",
+      "summary": "AlphaFold3 extends to all biomolecules including DNA, RNA, and small molecule ligands. Accuracy on protein-nucleic acid complexes reaches 80%+ on CASP-style benchmarks.",
+      "url": "https://www.nature.com/nbt/",
+      "category": "protein-ai"
+    },
+    {
+      "title": "FDA approves first CRISPR-based treatment for sickle cell disease in adults",
+      "source": "STAT News",
+      "date": "2026-06-22",
+      "summary": "Vertex/CRISPR Therapeutics' exa-cel (Casgevy) gains full FDA approval for sickle cell patients 18+. One-time treatment. 95% of patients free from vaso-occlusive crises at 2 years.",
+      "url": "https://www.statnews.com/",
+      "category": "gene-editing"
+    },
+    {
+      "title": "Moderna's mRNA-4157 cancer vaccine shows 65% reduction in melanoma recurrence at 4 years",
+      "source": "FierceBiotech",
+      "date": "2026-06-20",
+      "summary": "Phase 3 KEYNOTE-942 data: personalized mRNA cancer vaccine + Keytruda reduced recurrence by 65% vs Keytruda alone. Moderna filing for accelerated approval in US, EU, and Canada.",
+      "url": "https://www.fiercebiotech.com/",
+      "category": "immunotherapy"
+    },
+    {
+      "title": "Canada's CPHI announces first 5 sequencing hubs — Toronto, Montreal, Vancouver, Calgary, Ottawa",
+      "source": "Genome Canada",
+      "date": "2026-06-18",
+      "summary": "The Canadian Precision Health Initiative will sequence 100,000+ genomes across 5 regional hubs. Ontario hub at SickKids/UHN. Quebec hub at McGill/Mila. BC hub at Genome BC.",
+      "url": "https://www.genomecanada.ca/",
+      "category": "canada-biotech"
+    },
+    {
+      "title": "DeepSeek V4-Pro-DSpark goes open-source under MIT license — on-prem AI inference for biology",
+      "source": "TechCrunch",
+      "date": "2026-06-15",
+      "summary": "DeepSeek releases V4-Pro-DSpark as MIT-licensed open-source inference framework. Designed for air-gapped, auditable deployment. Paired with DeepSpec training repo. First major open-source model competitive with GPT-5.5/Opus 4.7 at 10-13x lower cost.",
+      "url": "https://techcrunch.com/",
+      "category": "ai-infrastructure"
+    },
+    {
+      "title": "AbCellera announces 4 new antibody programs entering Phase 1 — including pan-coronavirus candidate",
+      "source": "AbCellera Press Release",
+      "date": "2026-06-12",
+      "summary": "Vancouver-based AbCellera advances 4 programs to clinic: pan-coronavirus antibody, TIGIT immuno-oncology, GPCR target for metabolic disease, and a bispecific for solid tumors. All discovered via their AI antibody platform.",
+      "url": "https://www.abcellera.com/",
+      "category": "canada-biotech"
+    }
+  ],
+  "companies_to_watch": [
+    {
+      "name": "AbCellera",
+      "location": "Vancouver, BC",
+      "focus": "AI-powered antibody discovery platform",
+      "what_they_are_working_on": "Pan-coronavirus antibody, TIGIT immuno-oncology, GPCR metabolic targets, bispecifics for solid tumors. Partnership with Eli Lilly on COVID antibodies generated $1B+ revenue.",
+      "stage": "Clinical Phase 1-3",
+      "url": "https://www.abcellera.com/"
+    },
+    {
+      "name": "Deep Genomics",
+      "location": "Toronto, ON",
+      "focus": "AI-first RNA therapeutics",
+      "what_they_are_working_on": "AI platform predicts how genetic variants alter RNA splicing. Lead programs in Wilson disease, Stargardt disease, and CNS disorders. 10+ programs in pipeline.",
+      "stage": "Preclinical / Phase 1",
+      "url": "https://www.deepgenomics.com/"
+    },
+    {
+      "name": "Recursion Pharmaceuticals",
+      "location": "Salt Lake City, UT (US)",
+      "focus": "AI drug discovery via cellular imaging",
+      "what_they_are_working_on": "Phenomics platform maps billions of cellular responses to drugs. Lead candidates in cerebral cavernous malformation, NF2, and ovarian cancer. Merged with Exscientia in 2025.",
+      "stage": "Phase 2",
+      "url": "https://www.recursion.com/"
+    },
+    {
+      "name": "InSilico Medicine",
+      "location": "Hong Kong / New York",
+      "focus": "End-to-end AI drug discovery",
+      "what_they_are_working_on": "AI-designed INS018_055 for idiopathic pulmonary fibrosis (Phase 2 complete). 31 programs across fibrosis, oncology, immunology, and aging.",
+      "stage": "Phase 2 / Phase 3-ready",
+      "url": "https://insilico.com/"
+    },
+    {
+      "name": "Benchling",
+      "location": "San Francisco, CA (US)",
+      "focus": "Cloud platform for biotech R&D",
+      "what_they_are_working_on": "Unified platform for molecular biology, protein engineering, and lab automation. Used by 200,000+ scientists. Expanding into AI-native experiment design and automated lab notebooks.",
+      "stage": "Commercial (Series F, $6.1B valuation)",
+      "url": "https://www.benchling.com/"
+    },
+    {
+      "name": "Mila — Quebec AI Institute",
+      "location": "Montreal, QC",
+      "focus": "Academic AI research — biology track",
+      "what_they_are_working_on": "Protein design via geometric deep learning, RNA structure prediction, drug-target interaction, federated learning for multi-hospital clinical data. Yoshua Bengio's lab. 1,200+ researchers.",
+      "stage": "Academic research",
+      "url": "https://mila.quebec/"
+    }
+  ],
+  "what_to_look_forward_to": [
+    {
+      "event": "ASCO 2026 Annual Meeting",
+      "date": "2026-06-29",
+      "type": "conference",
+      "description": "American Society of Clinical Oncology. Major immuno-oncology trial readouts expected: Merck's Keytruda in adjuvant NSCLC, BMS's Opdivo+Yervoy combo, and several AI-discovered ADC candidates."
+    },
+    {
+      "event": "FDA PDUFA date — donanemab full approval",
+      "date": "2026-07-15",
+      "type": "regulatory",
+      "description": "Eli Lilly's anti-amyloid antibody donanemab expected to receive full FDA approval for early Alzheimer's. Will compete with Eisai/Biogen's Leqembi in the $15B+ Alzheimer's market."
+    },
+    {
+      "event": "BIO International Convention 2026",
+      "date": "2026-07-20",
+      "type": "conference",
+      "description": "Largest global biotech partnering event. Boston. AI in drug discovery track expanded 3x from 2025. Keynote: 'AI-native biotech — the companies doing drug discovery without wet labs.'"
+    },
+    {
+      "event": "CPHI sequencing begins — first 10,000 Canadian genomes",
+      "date": "2026-09-01",
+      "type": "milestone",
+      "description": "Canadian Precision Health Initiative begins sequencing at SickKids, McGill, Genome BC, Alberta Children's Hospital, and CHEO. The openclinical-ai substrate is designed to be the open deployment layer for CPHI-trained models."
+    }
+  ],
+  "categories": {
+    "protein-ai": "Protein & AI",
+    "gene-editing": "Gene Editing",
+    "immunotherapy": "Immunotherapy",
+    "canada-biotech": "Canadian Biotech",
+    "ai-infrastructure": "AI Infrastructure",
+    "regulatory": "Regulatory",
+    "conference": "Conferences"
+  }
+}
