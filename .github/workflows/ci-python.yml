@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python tests
+    runs-on: ubuntu-latest
+    if: hashFiles('pyproject.toml') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install package and test tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e . pytest ruff black pynacl
+      - name: Lint
+        run: ruff check .
+        continue-on-error: true
+      - name: Format check
+        run: black --check .
+        continue-on-error: true
+      - name: Tests
+        run: pytest -q
+
+  node:
+    name: Node build
+    runs-on: ubuntu-latest
+    if: hashFiles('package.json') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build --if-present
+      - name: Test
+        run: npm test --if-present
+
+  rust:
+    name: Rust check
+    runs-on: ubuntu-latest
+    if: hashFiles('Cargo.toml') != '' || hashFiles('src-tauri/Cargo.toml') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cargo check root
+        if: hashFiles('Cargo.toml') != ''
+        run: cargo check
+        continue-on-error: true
+      - name: Cargo check Tauri
+        if: hashFiles('src-tauri/Cargo.toml') != ''
+        run: cargo check --manifest-path src-tauri/Cargo.toml
+        continue-on-error: true
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
