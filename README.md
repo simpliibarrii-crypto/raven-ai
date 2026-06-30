@@ -3,6 +3,16 @@
 ![Raven AI](assets/raven-ai-banner.svg)
 
 [![License](https://img.shields.io/github/license/simpliibarrii-crypto/raven-ai?style=for-the-badge)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97-Live%20Demo-FFD21E?style=for-the-badge)](https://huggingface.co/spaces/bclermo/raven-ai)
+
+## ⚡ Quick Start
+
+```bash
+pip install raven-ai
+raven serve --port 8000
+```
+
+Or try the **[Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/bclermo/raven-ai)** — no installation required.
 [![CI](https://img.shields.io/github/actions/workflow/status/simpliibarrii-crypto/raven-ai/ci-python.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/simpliibarrii-crypto/raven-ai/actions)
 [![Flagship](https://img.shields.io/badge/flagship-Raven_AI-C8102E?style=for-the-badge&labelColor=05060A)](https://github.com/simpliibarrii-crypto/raven-ai)
 
