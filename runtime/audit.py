@@ -59,26 +59,44 @@ class AuditLogger:
 
         tenant_id filter is mandatory for production — without it, callers
         see events from all tenants which would be a multi-tenant breach.
+
+        Warning: Reads the entire JSONL file into memory. For production,
+        this should use pagination, streaming, and file rotation to avoid
+        memory exhaustion on large audit logs.
         """
         events = []
         if not self.log_file.exists():
             return events
 
-        with open(self.log_file) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                event = json.loads(line)
-                if tenant_id and event.get("tenant_id") != tenant_id:
-                    continue
-                if patient_id and event.get("patient_id") != patient_id:
-                    continue
-                if model_id and event.get("model_id") != model_id:
-                    continue
-                events.append(event)
-                if len(events) >= limit:
-                    break
+        try:
+            with open(self.log_file) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        event = json.loads(line)
+                    except json.JSONDecodeError:
+                        logger.warning("skipping malformed audit log line: %s", line[:100])
+                        continue
+                    if tenant_id and event.get("tenant_id") != tenant_id:
+                        continue
+                    if patient_id and event.get("patient_id") != patient_id:
+                        continue
+                    if model_id and event.get("model_id") != model_id:
+                        continue
+                    events.append(event)
+                    if len(events) >= limit:
+                        break
+        except FileNotFoundError:
+            logger.warning("audit log file not found: %s", self.log_file)
+            return events
+        except PermissionError:
+            logger.error("permission denied reading audit log: %s", self.log_file)
+            return events
+        except OSError as e:
+            logger.error("I/O error reading audit log %s: %s", self.log_file, e)
+            return events
 
         # Newest first
         return list(reversed(events))

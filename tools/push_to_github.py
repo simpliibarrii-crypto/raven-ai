@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 REPO = "simpliibarrii-crypto/raven-ai"
-ROOT = Path("/workspace/raven-ai")
+ROOT = Path(__file__).resolve().parents[1]
 
 FILES = [
     ".editorconfig",
@@ -24,6 +24,7 @@ FILES = [
     "biology_ai/__init__.py",
     "biology_ai/generation/__init__.py",
     "biology_ai/generation/adapters.py",
+    ".env.example",
     "consent/default-psw-brian.consent.json",
     "CONTRIBUTING.md",
     "Dockerfile",
@@ -115,7 +116,7 @@ def push_file(rel_path: str, sha: str | None) -> bool:
     content_b64 = base64.b64encode(content).decode("ascii")
 
     payload = {
-                    "message": f"raven-ai v0.6.0 — native american myth branding + agentic upgrade: {rel_path}",
+                    "message": f"raven-ai v0.4.0 — substrate update: {rel_path}",
                     "content": content_b64,
                     "branch": "main",
                 }

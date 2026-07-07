@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import secrets
 import time
 from dataclasses import dataclass, field
@@ -72,11 +73,23 @@ class TenantRegistry:
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
 
+    @staticmethod
+    def _demo_key_from_env(env_var: str, default: str) -> str:
+        """Load a demo API key from environment variable, falling back to default.
+
+        In production, set OPENCLINICAL_ENV=production to skip demo seeding entirely.
+        For local development, keys can be customized via .env file:
+            OPENCLINICAL_DEMO_KEY_BAYSHORE=my-custom-key
+        """
+        return os.getenv(env_var, default)
+
     def _seed_demo_tenants(self) -> None:
         """Create demo tenants for local development — covers all tiers.
 
-        WARNING: The API keys below are hardcoded demo keys intended ONLY for
+        WARNING: The API keys below are demo keys intended ONLY for
         local development and testing. They MUST NOT be used in production.
+        Override them via environment variables (see .env.example) or set
+        OPENCLINICAL_ENV=production to skip demo seeding entirely.
         In production, tenant records should be loaded from a secure database
         or secrets manager, not seeded from source code.
         """
@@ -85,7 +98,9 @@ class TenantRegistry:
                 "id": "bayshore-ottawa",
                 "name": "Bayshore Home Health — Ottawa",
                 "encryption_model": "agency-byok",
-                "api_key_hash": self._hash_key("demo-bayshore-key"),
+                "api_key_hash": self._hash_key(
+                    self._demo_key_from_env("OPENCLINICAL_DEMO_KEY_BAYSHORE", "demo-bayshore-key")
+                ),
                 "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:111122223333:key/bayshore-ottawa",
                 "contact_email": "ops-ottawa@bayshore.ca",
                 "created_at": "2026-06-29T00:00:00Z",
@@ -96,7 +111,9 @@ class TenantRegistry:
                 "id": "carefor-ottawa",
                 "name": "Carefor Health & Community Services",
                 "encryption_model": "agency-byok",
-                "api_key_hash": self._hash_key("demo-carefor-key"),
+                "api_key_hash": self._hash_key(
+                    self._demo_key_from_env("OPENCLINICAL_DEMO_KEY_CAREFOR", "demo-carefor-key")
+                ),
                 "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:444455556666:key/carefor-ottawa",
                 "contact_email": "it@carefor.ca",
                 "created_at": "2026-06-29T00:00:00Z",
@@ -107,7 +124,9 @@ class TenantRegistry:
                 "id": "vha-toronto",
                 "name": "VHA Home HealthCare",
                 "encryption_model": "platform-managed",
-                "api_key_hash": self._hash_key("demo-vha-key"),
+                "api_key_hash": self._hash_key(
+                    self._demo_key_from_env("OPENCLINICAL_DEMO_KEY_VHA", "demo-vha-key")
+                ),
                 "byok_key_ref": None,
                 "contact_email": "tech@vha.ca",
                 "created_at": "2026-06-29T00:00:00Z",
@@ -118,7 +137,9 @@ class TenantRegistry:
                 "id": "gary-j-armstrong",
                 "name": "Garry J. Armstrong Retirement Home",
                 "encryption_model": "agency-byok",
-                "api_key_hash": self._hash_key("demo-armstrong-key"),
+                "api_key_hash": self._hash_key(
+                    self._demo_key_from_env("OPENCLINICAL_DEMO_KEY_ARMSTRONG", "demo-armstrong-key")
+                ),
                 "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:777788889999:key/gary-j-armstrong",
                 "contact_email": "admin@gjah.ca",
                 "created_at": "2026-06-29T00:00:00Z",
@@ -129,7 +150,9 @@ class TenantRegistry:
                 "id": "toh-academic",
                 "name": "The Ottawa Hospital — Academic",
                 "encryption_model": "agency-byok",
-                "api_key_hash": self._hash_key("demo-toh-key"),
+                "api_key_hash": self._hash_key(
+                    self._demo_key_from_env("OPENCLINICAL_DEMO_KEY_TOH", "demo-toh-key")
+                ),
                 "byok_key_ref": "aws-kms:arn:aws:kms:ca-central-1:aaaabbbbcccc:key/toh-academic",
                 "contact_email": "ai-research@toh.ca",
                 "created_at": "2026-06-29T00:00:00Z",

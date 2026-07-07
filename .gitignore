@@ -22,6 +22,10 @@ data/consent/
 # Signing keys (NEVER commit the private key)
 registry/keys/*.key
 
+# Environment files (contain API keys and secrets)
+.env
+.env.local
+
 # Dev tools
 run_dev_logged.sh
 

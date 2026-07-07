@@ -1048,8 +1048,8 @@ async def family_timeline(
     Production: validates family token, returns only family-visible fields.
     """
     # Prefer header over query param — tokens in URLs land in logs + referrers
-    effective_token = x_family_token or token or ""
-    _ = effective_token  # MVP: unused; production validation target
+    # MVP: token validation is stubbed; production validates against consent engine
+    _family_token = x_family_token or token or ""
     return FamilyTimelineResponse(
         client_name="your loved one",
         visits=[],

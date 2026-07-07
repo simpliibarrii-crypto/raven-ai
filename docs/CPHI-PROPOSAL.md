@@ -423,7 +423,7 @@ Canadian precision medicine sovereignty requires:
 1. **Data sovereignty** — Canadian genomic data stays in Canada
 2. **Compute sovereignty** — Canadian compute for biology AI
 3. **Model sovereignty** — Canadian-trained biology AI for clinical use
-4. **Procurement sovereignty** — Canadian-controlled AI infrastructure for federal healthcareangi
+4. **Procurement sovereignty** — Canadian-controlled AI infrastructure for federal healthcare
 
 openclinical-ai delivers all four. No other CPHI proposal will.
 
@@ -448,7 +448,7 @@ Three years. $11M. Sovereign Canadian biology AI infrastructure for every Canadi
 
 ## Appendices
 
-### A. Project briefaren
+### A. Project brief
 
 See `docs/PROJECT-BRIEF.md` for the full project brief.
 

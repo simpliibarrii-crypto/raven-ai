@@ -92,6 +92,12 @@ class CostTracker:
         No cross-tenant visibility. This is by design: cost transparency
         is for the patient's affordability, not for tenant-vs-tenant
         competitive comparison.
+
+        WARNING: All cost data is stored in-memory (self.records). A container
+        restart loses all cost history. No persistence layer is implemented yet.
+        Production should persist cost records to Postgres or similar.
+
+        Returns a empty report (all zeros) if no records exist for the tenant.
         """
         records = self.records.get(tenant_id, [])
         if since_timestamp:
