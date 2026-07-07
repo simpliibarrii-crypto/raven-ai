@@ -35,7 +35,7 @@ ENV OPENCLINICAL_REGISTRY_PATH=/app/registry \
     OPENCLINICAL_AUDIT_PATH=/var/lib/openclinical/audit \
     OPENCLINICAL_CONSENT_PATH=/var/lib/openclinical/consent \
     OPENCLINICAL_TENANTS_PATH=/var/lib/openclinical/tenants \
-    OPENCLINICAL_CORS_ORIGINS=*
+    OPENCLINICAL_CORS_ORIGINS=http://localhost:8088
 
 RUN mkdir -p /var/lib/openclinical/audit /var/lib/openclinical/consent /var/lib/openclinical/tenants
 

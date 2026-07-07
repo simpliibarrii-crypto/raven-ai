@@ -65,7 +65,8 @@ class ConsentEngine:
         MVP rules:
         - consent_token must be present and valid
         - patient must have a consent record granting use of model_id
-        - consent must not be revokedola        """
+        - consent must not be revoked
+        """
         consent = self._load_consent(patient_id)
 
         if consent.get("status") == "no-record":

@@ -73,7 +73,13 @@ class TenantRegistry:
             json.dump(data, f, indent=2)
 
     def _seed_demo_tenants(self) -> None:
-        """Create demo tenants for local development — covers all tiers."""
+        """Create demo tenants for local development — covers all tiers.
+
+        WARNING: The API keys below are hardcoded demo keys intended ONLY for
+        local development and testing. They MUST NOT be used in production.
+        In production, tenant records should be loaded from a secure database
+        or secrets manager, not seeded from source code.
+        """
         demo_tenants = [
             {
                 "id": "bayshore-ottawa",

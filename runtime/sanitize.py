@@ -6,7 +6,7 @@ inference, sanitize:
 1. Strip known prompt-injection patterns
 2. Redact SSN/SIN/PHN patterns
 3. Cap input length to prevent resource exhaustion
-4. Log sanitization events for security auditboleha
+4. Log sanitization events for security audit
 
 This is defense-in-depth — model adapters should ALSO be defensive.
 See OWASP LLM01:2025 for the threat model.

@@ -12,7 +12,9 @@ Models supported:
 - ProteinMPNN (Baker lab) — sequence design from backbone
 - ESM-3 (EvolutionaryScale) — multi-modal protein generation
 - Bindcraft (Baker lab) — binder design against target
-- ProGen (Profluent/Salesforce) — protein language modelboleta**Critical:** Every adapter MUST pass generated sequences through biosecurity
+- ProGen (Profluent/Salesforce) — protein language model
+
+**Critical:** Every adapter MUST pass generated sequences through biosecurity
 screening (runtime/bio_security.py) before returning them. Per Science 2025,
 synthesis-provider screening is insufficient against AI-redesigned sequences.
 """
