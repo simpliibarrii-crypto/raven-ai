@@ -57,6 +57,25 @@ print(plan.actions)
 
 See [docs/TOKEN_ECONOMY.md](docs/TOKEN_ECONOMY.md) for the product policy and [docs/DEEPSEEK_DSPARK.md](docs/DEEPSEEK_DSPARK.md) for the research note.
 
+## Scientific Agent Gates
+
+Raven now includes dependency-free scientific run gates that check claim-level evidence labels, reproducibility artifacts, metrics, Token Economy metadata, PHI routing, and public-claim safety before a scientific-agent output is treated as publishable.
+
+```python
+from runtime.scientific_agent_gates import ScientificRunManifest, evaluate_scientific_run
+
+report = evaluate_scientific_run(ScientificRunManifest(
+    run_id="run-001",
+    task_id="bio-task-001",
+    question="What does this run test?",
+    hypothesis="Evidence-linked runs are easier to audit.",
+    workflow_stage="literature_review",
+))
+print(report.status)
+```
+
+See [docs/SCIENTIFIC_AGENT_GATES.md](docs/SCIENTIFIC_AGENT_GATES.md) for the research mapping and gate contract.
+
 ## Ecosystem operations
 
 See [docs/ECOSYSTEM_OPERATIONS.md](docs/ECOSYSTEM_OPERATIONS.md) for the unified roadmap, repo roles, demo rules, and immediate backlog.
