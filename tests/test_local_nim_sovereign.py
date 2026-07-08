@@ -42,7 +42,7 @@ def test_local_nim_sovereign_agent_emits_raven_packets() -> None:
     assert result.evidence_graph["schema"] == "raven.evidence_graph.v1"
     assert result.evidence_trace["schema"] == "raven.evidence_graph.v1"
     assert result.token_economy["draft_lane"] in {"local-small", "local-large"}
-    assert "runtime/local_nim_sovereign.py" in result.gate_report.findings[0].action or result.gate_report.status in {"pass", "warn"}
+    assert result.gate_report.status in {"pass", "warn"}
     assert client.messages is not None
     assert "Synthetic handoff note" in client.messages[-1]["content"]
     assert client.max_tokens == result.token_economy["max_output_tokens"]
