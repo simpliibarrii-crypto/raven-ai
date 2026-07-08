@@ -1,6 +1,8 @@
-# DeepSeek DSpark Integration
+# DeepSeek DSpark Research Note
 
-Raven should treat DeepSeek DSpark as a fast remote inference profile for public or approved internal work, not as a replacement for local privacy controls or Evidence Graph provenance.
+This document records what Raven learns from DeepSeek DSpark. It is not a requirement to use DeepSeek directly.
+
+The product feature is [Raven Token Economy](TOKEN_ECONOMY.md): a model-agnostic policy for drafting cheaply, verifying adaptively, reusing cache, narrowing context, and escalating only when needed.
 
 ## What Was Researched
 
@@ -11,58 +13,54 @@ Raven should treat DeepSeek DSpark as a fast remote inference profile for public
 | JSON and tools | Both V4 Flash and Pro list JSON output and tool-call support. | https://api-docs.deepseek.com/quick_start/pricing |
 | V4 positioning | DeepSeek describes V4 Flash as smaller, faster, and cost-effective; V4 Pro as the stronger reasoning/agentic model. | https://api-docs.deepseek.com/news/news260424 |
 | DSpark meaning | DSpark variants are not new base models; the Hugging Face card says they are the same checkpoint with an additional speculative decoding module attached. | https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-DSpark |
-| Open weights | `deepseek-ai/DeepSeek-V4-Flash-DSpark` is MIT licensed on Hugging Face and references DeepSpec for inference details. | https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-DSpark |
 | Research claim | The DSpark paper describes confidence-scheduled speculative decoding and reports 60-85 percent per-user generation speedups over the MTP-1 baseline in DeepSeek-V4 serving. | https://arxiv.org/abs/2607.05147 |
 
-## Raven Adoption Stance
+## Principle To Copy
 
-Use DeepSeek V4 Flash + DSpark as Raven's cheap-first remote reasoning lane after privacy and policy checks pass. Use DeepSeek V4 Pro + DSpark as an escalation lane for harder architecture, code, long-document synthesis, and agent planning tasks.
+Raven should copy the control pattern, not the vendor dependency:
 
-Do not route raw PHI, private patient data, credentials, unpublished lab records, or user-private documents to DeepSeek by default. Those tasks should stay local-first through Hermes Edge, Ollama, LM Studio, or an institution-approved deployment boundary.
+1. **Draft cheaply first.** Use cache, deterministic tools, local-small models, or cheap model lanes before heavy reasoning.
+2. **Estimate draft survival.** Use confidence, evidence coverage, risk, complexity, and citation requirements to decide whether a cheap draft is likely to pass verification.
+3. **Verify selectively.** Verify critical, high-risk, low-confidence, or weak-evidence spans instead of rechecking everything.
+4. **Respond to load.** Under high system load, preserve critical verification but skip stable low-risk spans.
+5. **Escalate late.** Use stronger models only after the cheap draft fails the confidence floor.
+6. **Keep provenance.** Attach the token-economy decision to Raven Evidence Graph traces so users can audit why the system spent tokens.
 
-## Runtime Contract
+## Raven Implementation
 
-The dependency-free provider profile lives in `runtime/provider_profiles.py`.
+`runtime/token_economy.py` implements the product policy.
 
 ```python
-from runtime.provider_profiles import ProviderRouteRequest, select_provider
+from runtime.token_economy import TokenEconomyRequest, plan_token_economy
 
-decision = select_provider(
-    ProviderRouteRequest(
-        task="public literature synthesis",
-        context_tokens=250_000,
-        reasoning="medium",
-        budget="lowest",
-        requires_json=True,
+plan = plan_token_economy(
+    TokenEconomyRequest(
+        task="summarize public literature",
+        complexity="research",
+        estimated_context_tokens=180_000,
+        cache_hit_ratio=0.35,
+        draft_confidence=0.45,
+        evidence_coverage=0.55,
+        requires_exact_citations=True,
     )
 )
-
-assert decision.profile.id == "deepseek-v4-flash-dspark"
 ```
 
-The profile module does not make network calls. It only decides which model lane is appropriate and returns provider provenance tags that can be attached to Raven Evidence Graph traces.
+`runtime/provider_profiles.py` remains a separate provider-capability registry. It can describe DeepSeek, OpenRouter, Qwen, local models, or future providers, but it is not the heart of the DSpark-inspired product feature.
 
 ## Ecosystem Fit
 
-| App | DeepSeek DSpark role |
+| App | Token-saving role |
 |---|---|
-| Raven AI | Owns the central provider profile, routing policy, and Evidence Graph provenance tags. |
-| OpenClinical AI | May use DeepSeek only for de-identified, policy-approved clinical admin/research workflows; raw PHI remains local or institution-approved. |
-| Home for AI | Can expose DeepSeek Flash as a cheap-first cloud lane for user-approved long-context tasks while keeping private connector payloads local. |
-| Hermes Edge | Remains the local/edge fallback and benchmark surface; DSpark is remote acceleration unless a self-hosted DeepSpec path is explicitly deployed. |
-
-## Suggested Routing Policy
-
-1. If the task is `private`, `phi`, or explicitly offline, choose `local-first-fallback`.
-2. If context exceeds the configured DeepSeek window, segment or summarize locally before remote routing.
-3. If the task is public/internal, latency-sensitive, budget-sensitive, JSON-oriented, or tool-oriented, choose `deepseek-v4-flash-dspark`.
-4. If the task is public/internal, high-reasoning, premium budget, and not latency-sensitive, choose `deepseek-v4-pro-dspark`.
-5. Always attach provider tags to evidence traces: `provider:deepseek`, `model:<model-id>`, and `profile:<profile-id>`.
+| Raven AI | Owns token economy, confidence scheduling, provider tags, and Evidence Graph traces. |
+| OpenClinical AI | Keeps PHI local, verifies critical spans, and avoids remote escalation by default. |
+| Home for AI | Shows users when answers came from cache, tools, local lanes, or escalation. |
+| Hermes Edge | Supplies local-small/local-large draft lanes and device benchmarks. |
 
 ## Implementation Notes
 
-- Keep `DEEPSEEK_API_KEY` out of source control.
-- Treat published prices and rate limits as volatile; verify the official pricing page before cost-sensitive production use.
-- Use Evidence Graph to record which provider profile produced or transformed an answer.
-- Use local redaction and source-ID references before sending large biomedical or clinical material to a remote model.
-- Benchmark Raven workflows before claiming DSpark speedups, because DSpark is an inference acceleration method and application latency still depends on routing, retrieval, network, output length, and evidence extraction.
+- Keep direct provider API keys out of source control.
+- Do not claim DSpark speedups for Raven until Raven workflows are benchmarked.
+- Use Evidence Graph to record token-economy decisions, draft lane, confidence floor, and verification spans.
+- Redact and slice context before any remote model call.
+- Treat DeepSeek DSpark as research inspiration and an optional provider profile, not as Raven's default product identity.
