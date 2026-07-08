@@ -238,6 +238,16 @@ def build_reason(
     )
 
 
+def verification_priority(span: VerificationSpan) -> float:
+    critical_bonus = 2.0 if span.risk == "critical" else 0.0
+    return (
+        critical_bonus
+        + RISK_WEIGHT[span.risk] * 0.55
+        + (1.0 - clamp(span.confidence)) * 0.35
+        + (1.0 - clamp(span.evidence_coverage)) * 0.10
+    )
+
+
 def schedule_verification(
     spans: list[VerificationSpan] | tuple[VerificationSpan, ...],
     *,
@@ -246,15 +256,7 @@ def schedule_verification(
 ) -> VerificationSchedule:
     """Schedule verification for the riskiest and least certain spans first."""
 
-    ordered = sorted(
-        spans,
-        key=lambda span: (
-            RISK_WEIGHT[span.risk] * 0.55
-            + (1.0 - clamp(span.confidence)) * 0.35
-            + (1.0 - clamp(span.evidence_coverage)) * 0.10
-        ),
-        reverse=True,
-    )
+    ordered = sorted(spans, key=verification_priority, reverse=True)
     if not ordered:
         return VerificationSchedule((), (), 0, "No spans need verification.")
 
@@ -271,5 +273,5 @@ def schedule_verification(
         spans_to_verify=tuple(selected),
         skipped_spans=skipped,
         token_budget=len(selected) * base_tokens_per_span,
-        reason="Confidence-scheduled verification prioritizes high-risk, low-confidence, low-evidence spans.",
+        reason="Confidence-scheduled verification prioritizes critical, high-risk, low-confidence, low-evidence spans.",
     )
