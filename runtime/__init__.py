@@ -1,7 +1,7 @@
-"""openclinical-ai runtime — inference runtime for biology AI and clinical AI models.
+"""Raven AI runtime.
 
-Sovereign inference — every call runs in the same jurisdiction as the patient data.
-Audit trail — every inference is logged with consent context.
-Model provenance — every model is signed and tracked in the registry.
+Local-first scientific AI infrastructure for biology, healthcare workflow,
+agent orchestration, evidence provenance, consent context, and audit trails.
 """
+
 __version__ = "0.4.0"
