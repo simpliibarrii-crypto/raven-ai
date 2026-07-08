@@ -53,24 +53,22 @@ class ProviderRouteDecision:
     requires_evidence_trace: bool = True
 
 
-DEEPSEEK_V4_FLASH_DSPARK = ModelProviderProfile(
-    id="deepseek-v4-flash-dspark",
-    label="DeepSeek V4 Flash + DSpark",
-    provider="deepseek",
-    model="deepseek-v4-flash",
-    base_url="https://api.deepseek.com",
+CHEAP_REMOTE_LANE = ModelProviderProfile(
+    id="cheap-remote-lane",
+    label="Cheap remote lane",
+    provider="remote-generic",
+    model="cheap-long-context-or-fast-reasoning",
+    base_url=None,
     context_tokens=1_000_000,
-    max_output_tokens=384_000,
+    max_output_tokens=64_000,
     supports_json=True,
     supports_tools=True,
-    thinking_modes=("thinking", "non-thinking"),
-    acceleration="DSpark speculative decoding when served by DeepSeek or self-hosted through DeepSpec-compatible inference.",
-    hf_reference="deepseek-ai/DeepSeek-V4-Flash-DSpark",
-    license="MIT weights on Hugging Face; API terms may differ.",
+    thinking_modes=("low", "medium"),
+    acceleration="Use the fastest/cost-effective approved provider available for the deployment.",
     best_for=(
         "cheap-first research reasoning",
-        "long-context summarization",
-        "agent planning",
+        "long-context summarization after slicing",
+        "agent planning drafts",
         "code and workflow drafting",
         "evidence graph source distillation",
     ),
@@ -79,24 +77,22 @@ DEEPSEEK_V4_FLASH_DSPARK = ModelProviderProfile(
         "tasks that must run fully offline",
         "final clinical decisions",
     ),
-    notes="Use as Raven's default remote long-context reasoning profile after local/privacy checks pass.",
+    notes="Vendor-neutral default lane. Implementations may map this to OpenRouter, DeepSeek, Qwen, hosted open models, or another approved provider.",
 )
 
 
-DEEPSEEK_V4_PRO_DSPARK = ModelProviderProfile(
-    id="deepseek-v4-pro-dspark",
-    label="DeepSeek V4 Pro + DSpark",
-    provider="deepseek",
-    model="deepseek-v4-pro",
-    base_url="https://api.deepseek.com",
+STRONG_REMOTE_LANE = ModelProviderProfile(
+    id="strong-remote-lane",
+    label="Strong remote lane",
+    provider="remote-generic",
+    model="strong-reasoning-escalation",
+    base_url=None,
     context_tokens=1_000_000,
-    max_output_tokens=384_000,
+    max_output_tokens=128_000,
     supports_json=True,
     supports_tools=True,
-    thinking_modes=("thinking", "non-thinking"),
-    acceleration="DSpark speculative decoding when served by DeepSeek or self-hosted through DeepSpec-compatible inference.",
-    hf_reference="deepseek-ai/DeepSeek-V4-Pro-DSpark",
-    license="MIT weights on Hugging Face; API terms may differ.",
+    thinking_modes=("high", "max"),
+    acceleration="Use only after cheap draft, confidence scheduling, and policy checks indicate escalation is worth the cost.",
     best_for=(
         "hard reasoning escalation",
         "architecture planning",
@@ -106,9 +102,9 @@ DEEPSEEK_V4_PRO_DSPARK = ModelProviderProfile(
     avoid_for=(
         "raw PHI or private patient data without an approved deployment boundary",
         "tasks that must run fully offline",
-        "cheap high-volume traffic when Flash is sufficient",
+        "cheap high-volume traffic when a draft lane is sufficient",
     ),
-    notes="Use as an escalation route when Flash is not enough and the workflow allows remote inference.",
+    notes="Vendor-neutral escalation lane. The selected provider should be deployment-specific and policy-approved.",
 )
 
 
@@ -127,14 +123,62 @@ LOCAL_FIRST_FALLBACK = ModelProviderProfile(
 )
 
 
-DEFAULT_PROFILES: tuple[ModelProviderProfile, ...] = (
-    DEEPSEEK_V4_FLASH_DSPARK,
-    DEEPSEEK_V4_PRO_DSPARK,
-    LOCAL_FIRST_FALLBACK,
+DEEPSEEK_V4_FLASH_DSPARK = ModelProviderProfile(
+    id="deepseek-v4-flash-dspark",
+    label="DeepSeek V4 Flash + DSpark reference",
+    provider="deepseek",
+    model="deepseek-v4-flash",
+    base_url="https://api.deepseek.com",
+    context_tokens=1_000_000,
+    max_output_tokens=384_000,
+    supports_json=True,
+    supports_tools=True,
+    thinking_modes=("thinking", "non-thinking"),
+    acceleration="DSpark speculative decoding when served by DeepSeek or self-hosted through DeepSpec-compatible inference.",
+    hf_reference="deepseek-ai/DeepSeek-V4-Flash-DSpark",
+    license="MIT weights on Hugging Face; API terms may differ.",
+    best_for=("research reference", "optional cheap remote lane implementation"),
+    avoid_for=("default product identity", "PHI/private data by default"),
+    notes="Research reference only. Raven Token Economy should not depend on this provider directly.",
 )
 
 
-def get_provider_profile(profile_id: str, profiles: tuple[ModelProviderProfile, ...] = DEFAULT_PROFILES) -> ModelProviderProfile:
+DEEPSEEK_V4_PRO_DSPARK = ModelProviderProfile(
+    id="deepseek-v4-pro-dspark",
+    label="DeepSeek V4 Pro + DSpark reference",
+    provider="deepseek",
+    model="deepseek-v4-pro",
+    base_url="https://api.deepseek.com",
+    context_tokens=1_000_000,
+    max_output_tokens=384_000,
+    supports_json=True,
+    supports_tools=True,
+    thinking_modes=("thinking", "non-thinking"),
+    acceleration="DSpark speculative decoding when served by DeepSeek or self-hosted through DeepSpec-compatible inference.",
+    hf_reference="deepseek-ai/DeepSeek-V4-Pro-DSpark",
+    license="MIT weights on Hugging Face; API terms may differ.",
+    best_for=("research reference", "optional strong remote lane implementation"),
+    avoid_for=("default product identity", "PHI/private data by default"),
+    notes="Research reference only. Raven Token Economy should not depend on this provider directly.",
+)
+
+
+DEFAULT_PROFILES: tuple[ModelProviderProfile, ...] = (
+    CHEAP_REMOTE_LANE,
+    STRONG_REMOTE_LANE,
+    LOCAL_FIRST_FALLBACK,
+)
+
+REFERENCE_PROFILES: tuple[ModelProviderProfile, ...] = (
+    DEEPSEEK_V4_FLASH_DSPARK,
+    DEEPSEEK_V4_PRO_DSPARK,
+)
+
+
+def get_provider_profile(
+    profile_id: str,
+    profiles: tuple[ModelProviderProfile, ...] = DEFAULT_PROFILES + REFERENCE_PROFILES,
+) -> ModelProviderProfile:
     for profile in profiles:
         if profile.id == profile_id:
             return profile
@@ -142,7 +186,7 @@ def get_provider_profile(profile_id: str, profiles: tuple[ModelProviderProfile, 
 
 
 def select_provider(request: ProviderRouteRequest) -> ProviderRouteDecision:
-    """Select a safe provider profile using Raven's privacy-first routing posture."""
+    """Select a provider lane using Raven's privacy-first routing posture."""
 
     if request.requires_local or request.sensitivity in {"private", "phi"}:
         return ProviderRouteDecision(
@@ -150,27 +194,27 @@ def select_provider(request: ProviderRouteRequest) -> ProviderRouteDecision:
             reason="Local route required because the request is private, PHI-bearing, or explicitly offline.",
         )
 
-    if request.context_tokens > DEEPSEEK_V4_FLASH_DSPARK.context_tokens:
+    if request.context_tokens > CHEAP_REMOTE_LANE.context_tokens:
         return ProviderRouteDecision(
             profile=LOCAL_FIRST_FALLBACK,
-            reason="Context exceeds the configured DeepSeek V4 window; segment locally before remote routing.",
+            reason="Context exceeds the configured remote lane window; segment locally before remote routing.",
         )
 
     if request.reasoning == "high" and request.budget != "lowest" and not request.latency_sensitive:
         return ProviderRouteDecision(
-            profile=DEEPSEEK_V4_PRO_DSPARK,
-            reason="High-reasoning public/internal task can use the Pro DSpark escalation profile.",
+            profile=STRONG_REMOTE_LANE,
+            reason="High-reasoning public/internal task can use the vendor-neutral strong escalation lane.",
         )
 
     if request.requires_json or request.requires_tools or request.latency_sensitive or request.budget in {"lowest", "balanced"}:
         return ProviderRouteDecision(
-            profile=DEEPSEEK_V4_FLASH_DSPARK,
-            reason="Flash DSpark is the cheap-first long-context route with JSON/tool support.",
+            profile=CHEAP_REMOTE_LANE,
+            reason="Cheap remote lane is the default long-context draft route after policy checks pass.",
         )
 
     return ProviderRouteDecision(
-        profile=DEEPSEEK_V4_FLASH_DSPARK,
-        reason="Default public/internal Raven reasoning route.",
+        profile=CHEAP_REMOTE_LANE,
+        reason="Default public/internal Raven draft route.",
     )
 
 
