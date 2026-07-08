@@ -29,6 +29,21 @@ Raven is the flagship product in the ecosystem: a local-first, cloud-optional pl
 | Raven LabOps | Protocol execution, sample tracking, instrument coordination, audit logs |
 | Raven Research | Literature review, citation verification, hypotheses, reproducible reports |
 
+## Raven Evidence Graph
+
+Raven Evidence Graph is the dependency-free provenance layer for claims, sources, confidence, risk, and answer traces. It gives Raven agents a compact JSON contract that can travel cleanly across OpenClinical AI, Home for AI, Hermes Edge, notebooks, demos, and audit logs.
+
+```python
+from runtime.evidence_graph import EvidenceGraph
+
+graph = EvidenceGraph()
+source = graph.add_source(title="Protocol v1", source_type="protocol")
+claim = graph.add_claim("Audit logs should preserve signed consent context.", [source.id])
+trace = graph.trace_answer("What should this workflow preserve?", [claim.id])
+```
+
+See [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md) for the data model, scoring contract, and integration notes.
+
 ## Repository status
 
 This repository contains the active Raven platform work plus architecture previews. The Python runtime and clinical/home-care substrate are the current working foundation. Rust, Flutter, and mobile modules are being hardened behind CI before being promoted as stable.
