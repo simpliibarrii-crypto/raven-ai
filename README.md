@@ -44,18 +44,18 @@ trace = graph.trace_answer("What should this workflow preserve?", [claim.id])
 
 See [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md) for the data model, scoring contract, and integration notes.
 
-## DeepSeek DSpark lane
+## Raven Token Economy
 
-Raven includes dependency-free provider profiles for DeepSeek V4 Flash/Pro + DSpark. The default stance is cheap-first remote reasoning for public or approved internal long-context work, with local-first fallback for PHI, private data, and offline workflows.
+Raven studies DSpark's useful token-saving principle without depending on DeepSeek directly: draft cheaply, verify by confidence/risk/evidence, reuse cache, retrieve narrow slices, and escalate only when the cheap draft fails.
 
 ```python
-from runtime.provider_profiles import ProviderRouteRequest, select_provider
+from runtime.token_economy import TokenEconomyRequest, plan_token_economy
 
-decision = select_provider(ProviderRouteRequest(task="public literature synthesis", requires_json=True))
-print(decision.profile.id)  # deepseek-v4-flash-dspark
+plan = plan_token_economy(TokenEconomyRequest(task="public literature synthesis", cache_hit_ratio=0.4))
+print(plan.actions)
 ```
 
-See [docs/DEEPSEEK_DSPARK.md](docs/DEEPSEEK_DSPARK.md) for the research notes, routing policy, and ecosystem adoption plan.
+See [docs/TOKEN_ECONOMY.md](docs/TOKEN_ECONOMY.md) for the product policy and [docs/DEEPSEEK_DSPARK.md](docs/DEEPSEEK_DSPARK.md) for the research note.
 
 ## Demo video
 
