@@ -44,6 +44,12 @@ trace = graph.trace_answer("What should this workflow preserve?", [claim.id])
 
 See [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md) for the data model, scoring contract, and integration notes.
 
+## Demo video
+
+Watch the clean Raven Evidence Graph demo on X: https://x.com/i/web/status/2074684335639187945
+
+The video is generated from pure code with no Replit, HeyGen, React Flow, stock, or generator watermark. See [docs/CLEAN_DEMO_VIDEO.md](docs/CLEAN_DEMO_VIDEO.md) and [scripts/render_clean_demo_video.py](scripts/render_clean_demo_video.py).
+
 ## Repository status
 
 This repository contains the active Raven platform work plus architecture previews. The Python runtime and clinical/home-care substrate are the current working foundation. Rust, Flutter, and mobile modules are being hardened behind CI before being promoted as stable.
