@@ -44,6 +44,19 @@ trace = graph.trace_answer("What should this workflow preserve?", [claim.id])
 
 See [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md) for the data model, scoring contract, and integration notes.
 
+## DeepSeek DSpark lane
+
+Raven includes dependency-free provider profiles for DeepSeek V4 Flash/Pro + DSpark. The default stance is cheap-first remote reasoning for public or approved internal long-context work, with local-first fallback for PHI, private data, and offline workflows.
+
+```python
+from runtime.provider_profiles import ProviderRouteRequest, select_provider
+
+decision = select_provider(ProviderRouteRequest(task="public literature synthesis", requires_json=True))
+print(decision.profile.id)  # deepseek-v4-flash-dspark
+```
+
+See [docs/DEEPSEEK_DSPARK.md](docs/DEEPSEEK_DSPARK.md) for the research notes, routing policy, and ecosystem adoption plan.
+
 ## Demo video
 
 Watch the clean Raven Evidence Graph demo on X: https://x.com/i/web/status/2074684335639187945
