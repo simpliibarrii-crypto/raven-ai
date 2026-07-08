@@ -17,6 +17,7 @@ This repository is part of the Raven AI ecosystem:
 4. Modular adapters rather than hard-coded model or vendor lock-in.
 5. Fail-loud behavior for privacy, safety, and policy violations.
 6. Portable trace packets that can move between apps without leaking private source content by default.
+7. Provider routing that chooses cheap/fast remote models only after local privacy gates pass.
 
 ## High-level diagram
 
@@ -25,9 +26,11 @@ flowchart TB
   User[Researcher / Clinician / Operator] --> UI[Client UI]
   UI --> API[Runtime API]
   API --> Agents[Agent + Tool Layer]
+  Agents --> Router[Provider Router]
+  Router --> Models[Model Adapters]
+  Router --> Local[Local / Edge Fallback]
   Agents --> Graph[Raven Evidence Graph]
   Agents --> Workflows[Workflow Engine]
-  Agents --> Models[Model Adapters]
   Graph --> Sources[Evidence + Data Sources]
   Graph --> Traces[(Answer Traces)]
   API --> Governance[Governance: audit, consent, provenance]
@@ -40,6 +43,7 @@ flowchart TB
 - **Interface layer**: web, desktop, mobile, or CLI entry points.
 - **Runtime layer**: API routes, tenancy, auth, model/tool dispatch.
 - **Agent layer**: task planning, tool use, domain workflows.
+- **Provider layer**: capability profiles, privacy-aware routing, cheap-first remote inference, and local fallback.
 - **Evidence layer**: claim extraction, source references, confidence scoring, risk tagging, and trace serialization.
 - **Governance layer**: consent, policy checks, audit logs, provenance.
 - **Deployment layer**: Docker, local runtime, cloud deployment, edge.
@@ -54,6 +58,18 @@ Raven Evidence Graph is the shared runtime contract for explainable outputs. App
 | OpenClinical AI | Attaches evidence traces to clinical workflow outputs and audit records. |
 | Home for AI | Stores local agent run traces and makes them inspectable from the home dashboard. |
 | Hermes Edge | Emits compact evidence packets for edge benchmarks and offline runs. |
+
+## Provider routing contract
+
+`runtime/provider_profiles.py` defines model/provider capabilities before live adapters are wired. The current profiles include DeepSeek V4 Flash/Pro + DSpark as remote long-context lanes and a local-first fallback profile for private, PHI-bearing, or offline work.
+
+| Profile | Role |
+|---|---|
+| `deepseek-v4-flash-dspark` | Cheap-first public/internal long-context reasoning with JSON/tool support. |
+| `deepseek-v4-pro-dspark` | Higher-reasoning escalation for public/internal architecture, code, and synthesis tasks. |
+| `local-first-fallback` | Default for PHI, private data, offline runs, and edge execution. |
+
+See [DEEPSEEK_DSPARK.md](DEEPSEEK_DSPARK.md) for research notes and adoption policy.
 
 ## Current maturity
 
