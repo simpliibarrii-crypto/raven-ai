@@ -17,7 +17,7 @@ This repository is part of the Raven AI ecosystem:
 4. Modular adapters rather than hard-coded model or vendor lock-in.
 5. Fail-loud behavior for privacy, safety, and policy violations.
 6. Portable trace packets that can move between apps without leaking private source content by default.
-7. Provider routing that chooses cheap/fast remote models only after local privacy gates pass.
+7. Token economy that drafts cheaply, verifies selectively, reuses cache, narrows context, and escalates late.
 
 ## High-level diagram
 
@@ -26,7 +26,8 @@ flowchart TB
   User[Researcher / Clinician / Operator] --> UI[Client UI]
   UI --> API[Runtime API]
   API --> Agents[Agent + Tool Layer]
-  Agents --> Router[Provider Router]
+  Agents --> Economy[Raven Token Economy]
+  Economy --> Router[Provider Router]
   Router --> Models[Model Adapters]
   Router --> Local[Local / Edge Fallback]
   Agents --> Graph[Raven Evidence Graph]
@@ -43,6 +44,7 @@ flowchart TB
 - **Interface layer**: web, desktop, mobile, or CLI entry points.
 - **Runtime layer**: API routes, tenancy, auth, model/tool dispatch.
 - **Agent layer**: task planning, tool use, domain workflows.
+- **Token economy layer**: cache reuse, context budgeting, cheap drafting, confidence-scheduled verification, thinking levels, and late escalation.
 - **Provider layer**: capability profiles, privacy-aware routing, cheap-first remote inference, and local fallback.
 - **Evidence layer**: claim extraction, source references, confidence scoring, risk tagging, and trace serialization.
 - **Governance layer**: consent, policy checks, audit logs, provenance.
@@ -59,17 +61,23 @@ Raven Evidence Graph is the shared runtime contract for explainable outputs. App
 | Home for AI | Stores local agent run traces and makes them inspectable from the home dashboard. |
 | Hermes Edge | Emits compact evidence packets for edge benchmarks and offline runs. |
 
+## Token economy contract
+
+`runtime/token_economy.py` applies the DSpark-inspired product principle without binding Raven to DeepSeek directly. It tells Raven how to spend fewer tokens while preserving review quality.
+
+| Step | Role |
+|---|---|
+| Cache reuse | Reuse prior summaries, traces, and known project context before adding raw context. |
+| Narrow retrieval | Pull only relevant evidence slices instead of dumping full files into prompts. |
+| Cheap draft | Draft with cache, tools, local-small, local-large, or cheap remote lanes first. |
+| Confidence scheduling | Verify critical, high-risk, low-confidence, or weak-evidence spans first. |
+| Late escalation | Escalate to stronger reasoning only after the cheap draft fails the confidence floor. |
+
+See [TOKEN_ECONOMY.md](TOKEN_ECONOMY.md) for the product policy and [DEEPSEEK_DSPARK.md](DEEPSEEK_DSPARK.md) for the research note.
+
 ## Provider routing contract
 
-`runtime/provider_profiles.py` defines model/provider capabilities before live adapters are wired. The current profiles include DeepSeek V4 Flash/Pro + DSpark as remote long-context lanes and a local-first fallback profile for private, PHI-bearing, or offline work.
-
-| Profile | Role |
-|---|---|
-| `deepseek-v4-flash-dspark` | Cheap-first public/internal long-context reasoning with JSON/tool support. |
-| `deepseek-v4-pro-dspark` | Higher-reasoning escalation for public/internal architecture, code, and synthesis tasks. |
-| `local-first-fallback` | Default for PHI, private data, offline runs, and edge execution. |
-
-See [DEEPSEEK_DSPARK.md](DEEPSEEK_DSPARK.md) for research notes and adoption policy.
+`runtime/provider_profiles.py` defines optional model/provider capabilities before live adapters are wired. Provider profiles are secondary to Token Economy: they describe available lanes, while Token Economy decides when a lane deserves tokens.
 
 ## Current maturity
 

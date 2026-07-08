@@ -3,9 +3,10 @@ from __future__ import annotations
 import pytest
 
 from runtime.provider_profiles import (
+    CHEAP_REMOTE_LANE,
     DEEPSEEK_V4_FLASH_DSPARK,
-    DEEPSEEK_V4_PRO_DSPARK,
     LOCAL_FIRST_FALLBACK,
+    STRONG_REMOTE_LANE,
     ProviderRouteRequest,
     evidence_trace_tags,
     get_provider_profile,
@@ -13,7 +14,7 @@ from runtime.provider_profiles import (
 )
 
 
-def test_flash_dspark_is_default_cheap_first_route():
+def test_cheap_remote_lane_is_default_draft_route():
     decision = select_provider(
         ProviderRouteRequest(
             task="summarize public research notes",
@@ -24,13 +25,14 @@ def test_flash_dspark_is_default_cheap_first_route():
         )
     )
 
-    assert decision.profile == DEEPSEEK_V4_FLASH_DSPARK
+    assert decision.profile == CHEAP_REMOTE_LANE
+    assert decision.profile.provider == "remote-generic"
     assert decision.profile.supports_json is True
     assert decision.profile.supports_tools is True
-    assert "cheap-first" in decision.reason
+    assert "Cheap remote lane" in decision.reason
 
 
-def test_pro_dspark_is_high_reasoning_escalation():
+def test_strong_remote_lane_is_high_reasoning_escalation():
     decision = select_provider(
         ProviderRouteRequest(
             task="plan a multi-agent biology workflow",
@@ -41,8 +43,8 @@ def test_pro_dspark_is_high_reasoning_escalation():
         )
     )
 
-    assert decision.profile == DEEPSEEK_V4_PRO_DSPARK
-    assert "escalation" in decision.reason
+    assert decision.profile == STRONG_REMOTE_LANE
+    assert "strong escalation lane" in decision.reason
 
 
 def test_private_or_phi_work_routes_local_first():
@@ -73,17 +75,25 @@ def test_context_overflow_requires_local_segmentation():
     assert "segment locally" in decision.reason
 
 
-def test_evidence_trace_tags_capture_provider_provenance():
+def test_evidence_trace_tags_capture_vendor_neutral_lane():
     decision = select_provider(ProviderRouteRequest(task="public literature synthesis"))
 
     assert evidence_trace_tags(decision) == (
-        "provider:deepseek",
-        "model:deepseek-v4-flash",
-        "profile:deepseek-v4-flash-dspark",
+        "provider:remote-generic",
+        "model:cheap-long-context-or-fast-reasoning",
+        "profile:cheap-remote-lane",
     )
 
 
+def test_deepseek_profile_is_reference_not_default():
+    profile = get_provider_profile("deepseek-v4-flash-dspark")
+
+    assert profile == DEEPSEEK_V4_FLASH_DSPARK
+    assert profile.provider == "deepseek"
+    assert "Research reference only" in profile.notes
+
+
 def test_get_provider_profile_rejects_unknown_ids():
-    assert get_provider_profile("deepseek-v4-flash-dspark") == DEEPSEEK_V4_FLASH_DSPARK
+    assert get_provider_profile("cheap-remote-lane") == CHEAP_REMOTE_LANE
     with pytest.raises(KeyError):
         get_provider_profile("missing")
