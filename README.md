@@ -37,7 +37,7 @@ Raven Evidence Graph is the dependency-free provenance layer for claims, sources
 from runtime.evidence_graph import EvidenceGraph
 
 graph = EvidenceGraph()
-source = graph.add_source(title="Protocol v1", source_type="protocol")
+source = graph.add_source(title="Protocol v1", kind="protocol")
 claim = graph.add_claim("Audit logs should preserve signed consent context.", [source.id])
 trace = graph.trace_answer("What should this workflow preserve?", [claim.id])
 ```
@@ -56,6 +56,10 @@ print(plan.actions)
 ```
 
 See [docs/TOKEN_ECONOMY.md](docs/TOKEN_ECONOMY.md) for the product policy and [docs/DEEPSEEK_DSPARK.md](docs/DEEPSEEK_DSPARK.md) for the research note.
+
+## Ecosystem operations
+
+See [docs/ECOSYSTEM_OPERATIONS.md](docs/ECOSYSTEM_OPERATIONS.md) for the unified roadmap, repo roles, demo rules, and immediate backlog.
 
 ## Demo video
 
