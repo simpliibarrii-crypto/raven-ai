@@ -84,21 +84,14 @@ def clamp(value: float, low: float = 0.0, high: float = 1.0) -> float:
 
 
 def estimate_survival_probability(request: TokenEconomyRequest) -> float:
-    """Approximate whether a cheap draft will survive heavier verification.
-
-    Strong drafts with strong evidence deserve a small synergy bonus because
-    confidence and evidence reinforce each other. Weak drafts still pay the full
-    risk and complexity penalties, preserving conservative behavior for fragile
-    or high-risk work.
-    """
+    """Approximate whether a cheap draft will survive heavier verification."""
 
     confidence = clamp(request.draft_confidence)
     evidence = clamp(request.evidence_coverage)
     risk_penalty = RISK_WEIGHT[request.risk] * 0.24
-    complexity_penalty = COMPLEXITY_WEIGHT[request.complexity] * 0.18
+    complexity_penalty = COMPLEXITY_WEIGHT[request.complexity] * 0.10
     citation_bonus = 0.06 if request.requires_exact_citations and evidence >= 0.75 else 0.0
-    synergy_bonus = 0.08 if confidence >= 0.8 and evidence >= 0.8 else 0.0
-    return clamp((confidence * 0.58) + (evidence * 0.36) + synergy_bonus + citation_bonus - risk_penalty - complexity_penalty)
+    return clamp((confidence * 0.58) + (evidence * 0.36) + citation_bonus - risk_penalty - complexity_penalty)
 
 
 def choose_thinking_level(request: TokenEconomyRequest) -> ThinkingLevel:
