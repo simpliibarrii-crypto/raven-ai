@@ -89,7 +89,7 @@ def estimate_survival_probability(request: TokenEconomyRequest) -> float:
     confidence = clamp(request.draft_confidence)
     evidence = clamp(request.evidence_coverage)
     risk_penalty = RISK_WEIGHT[request.risk] * 0.24
-    complexity_penalty = COMPLEXITY_WEIGHT[request.complexity] * 0.18
+    complexity_penalty = COMPLEXITY_WEIGHT[request.complexity] * 0.10
     citation_bonus = 0.06 if request.requires_exact_citations and evidence >= 0.75 else 0.0
     return clamp((confidence * 0.58) + (evidence * 0.36) + citation_bonus - risk_penalty - complexity_penalty)
 
