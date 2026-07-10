@@ -1,6 +1,6 @@
 [project]
 name = "raven-ai"
-version = "0.1.0"
+version = "0.4.0"
 description = "Open-source agent platform for biology AI, clinical workflows, and local-first scientific automation"
 authors = [{name = "Barry Clerjuste", email = "bclerjuste@gmail.com"}]
 license = {text = "Apache-2.0"}
@@ -19,6 +19,18 @@ dependencies = [
     "pynacl>=1.5,<1.6",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10",
+    "bandit>=1.7",
+    "pip-audit>=2.7",
+]
+
+[project.scripts]
+raven = "runtime.cli:main"
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
@@ -29,3 +41,24 @@ include = ["runtime*", "registry*", "audit_gateway*", "consent*", "fhir*", "psw_
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.yaml", "*.yml", "*.html", "*.css", "*.js"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q --tb=short"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "examples", ".devcontainer", ".github"]
+skips = ["B101"]
