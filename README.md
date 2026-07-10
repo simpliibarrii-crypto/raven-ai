@@ -1,4 +1,8 @@
-<p align="center">\n  <strong><a href="https://barry-ai-public.simpliibarrii.chatgpt.site">Explore the complete AI research & projects portfolio →</a></strong>\n</p>\n\n# Raven AI
+<p align="center">
+  <strong><a href="https://barry-ai-public.simpliibarrii.chatgpt.site">Explore the complete AI research & projects portfolio →</a></strong>
+</p>
+
+# Raven AI
 
 ![Raven AI](assets/raven-ai-banner.svg)
 
