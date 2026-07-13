@@ -1,0 +1,16 @@
+services:
+  demo:
+    build: .
+    ports: ["7860:7860"]
+    volumes: ["./runs:/workspace/runs"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+  worker:
+    build: .
+    command: ["python", "-c", "from raven_biocomputer import BioComputer; print(BioComputer().execute(task='smoke', tool='sequence_stats', payload={'sequence':'ACGT'}))"]
+    network_mode: none
+    read_only: true
+    tmpfs: ["/tmp"]
+    volumes: ["./runs:/workspace/runs"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
