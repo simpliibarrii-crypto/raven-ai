@@ -7,9 +7,11 @@ EvidenceLabel = Literal["support", "contradict", "not_enough_information"]
 FindingSeverity = Literal["info", "warn", "fail"]
 RiskTier = Literal["low", "medium", "high", "critical"]
 WorkflowStage = Literal["literature_review", "experimentation", "analysis", "report", "deployment"]
+EvaluationStepStatus = Literal["pass", "fail", "pending"]
 
 SEVERITY_WEIGHT: dict[FindingSeverity, float] = {"info": 0.0, "warn": 0.08, "fail": 0.22}
 RISK_WEIGHT: dict[RiskTier, int] = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+BENCHMARK_SCHEMA = "raven.scientific_benchmark.v1"
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,100 @@ class ScientificClaimCheck:
     source_ids: tuple[str, ...] = ()
     confidence: float = 0.5
     rationale: str = ""
+
+
+@dataclass(frozen=True)
+class ScientificEvaluationStep:
+    """One independently verifiable step in a scientific-agent benchmark."""
+
+    step_id: str
+    description: str
+    expected_artifact: str
+    pass_criterion: str
+    status: EvaluationStepStatus = "pending"
+    observed_artifact: str | None = None
+    notes: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "step_id": self.step_id,
+            "description": self.description,
+            "expected_artifact": self.expected_artifact,
+            "pass_criterion": self.pass_criterion,
+            "status": self.status,
+            "observed_artifact": self.observed_artifact,
+            "notes": self.notes,
+        }
+
+
+@dataclass(frozen=True)
+class AtomicFactEvaluation:
+    """Atomic-fact counts and deterministic precision/recall calculations."""
+
+    supported_count: int = 0
+    unsupported_count: int = 0
+    contradictory_count: int = 0
+    reference_count: int = 0
+
+    @property
+    def predicted_count(self) -> int:
+        return self.supported_count + self.unsupported_count + self.contradictory_count
+
+    @property
+    def precision(self) -> float:
+        if self.predicted_count == 0:
+            return 0.0
+        return round(self.supported_count / self.predicted_count, 4)
+
+    @property
+    def recall(self) -> float:
+        if self.reference_count == 0:
+            return 0.0
+        return round(self.supported_count / self.reference_count, 4)
+
+    def to_dict(self) -> dict[str, int | float]:
+        return {
+            "supported_count": self.supported_count,
+            "unsupported_count": self.unsupported_count,
+            "contradictory_count": self.contradictory_count,
+            "reference_count": self.reference_count,
+            "predicted_count": self.predicted_count,
+            "precision": self.precision,
+            "recall": self.recall,
+        }
+
+
+@dataclass(frozen=True)
+class ScientificBenchmarkManifest:
+    """Clean-room, stepwise benchmark contract for scientific-agent outputs."""
+
+    benchmark_id: str
+    steps: tuple[ScientificEvaluationStep, ...] = ()
+    atomic_facts: AtomicFactEvaluation = field(default_factory=AtomicFactEvaluation)
+    clean_room: bool = False
+    allowed_source_ids: tuple[str, ...] = ()
+    precision_floor: float = 0.0
+    recall_floor: float = 0.0
+    require_all_steps: bool = True
+    require_no_unsupported: bool = True
+    notes: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-serializable benchmark packet."""
+
+        return {
+            "schema": BENCHMARK_SCHEMA,
+            "benchmark_id": self.benchmark_id,
+            "steps": [step.to_dict() for step in self.steps],
+            "atomic_facts": self.atomic_facts.to_dict(),
+            "clean_room": self.clean_room,
+            "allowed_source_ids": list(self.allowed_source_ids),
+            "precision_floor": self.precision_floor,
+            "recall_floor": self.recall_floor,
+            "require_all_steps": self.require_all_steps,
+            "require_no_unsupported": self.require_no_unsupported,
+            "notes": self.notes,
+        }
 
 
 @dataclass(frozen=True)
@@ -49,6 +145,7 @@ class ScientificRunManifest:
     claims_state_of_art: bool = False
     claims_autonomous_discovery: bool = False
     notes: str = ""
+    benchmark: ScientificBenchmarkManifest | None = None
 
 
 @dataclass(frozen=True)
@@ -134,6 +231,9 @@ def evaluate_scientific_run(manifest: ScientificRunManifest) -> GateReport:
         if not manifest.environment_fingerprint:
             findings.append(_finding("warn", "missing-environment", "No environment fingerprint was recorded.", "Record package versions, container digest, or runtime fingerprint."))
 
+    if manifest.benchmark is not None:
+        findings.extend(_evaluate_benchmark(manifest, known_sources))
+
     findings.extend(_evaluate_metrics_and_cost(manifest))
     findings.extend(_evaluate_privacy_and_claims(manifest))
 
@@ -174,6 +274,72 @@ def _evaluate_claim_checks(
         missing = [source_id for source_id in check.source_ids if known_sources and source_id not in known_sources]
         if missing:
             findings.append(_finding("fail", "unknown-source-id", f"Claim {check.claim_id!r} references unknown source ids: {', '.join(missing)}.", "Attach every referenced source to the run manifest."))
+    return findings
+
+
+def _evaluate_benchmark(
+    manifest: ScientificRunManifest,
+    known_sources: set[str],
+) -> list[GateFinding]:
+    benchmark = manifest.benchmark
+    if benchmark is None:
+        return []
+
+    findings: list[GateFinding] = []
+    if not benchmark.benchmark_id.strip():
+        findings.append(_finding("fail", "missing-benchmark-id", "The benchmark has no stable id.", "Assign a stable benchmark id."))
+    if not benchmark.steps:
+        findings.append(_finding("fail", "missing-benchmark-steps", "The benchmark has no verifiable steps.", "Decompose the task into artifact-backed evaluation steps."))
+
+    seen_step_ids: set[str] = set()
+    for step in benchmark.steps:
+        if not step.step_id.strip():
+            findings.append(_finding("fail", "missing-step-id", "A benchmark step has no stable id.", "Assign every benchmark step a unique id."))
+        elif step.step_id in seen_step_ids:
+            findings.append(_finding("fail", "duplicate-step-id", f"Benchmark step id {step.step_id!r} is duplicated.", "Use unique step ids."))
+        seen_step_ids.add(step.step_id)
+
+        if not step.description.strip() or not step.expected_artifact.strip() or not step.pass_criterion.strip():
+            findings.append(_finding("fail", "incomplete-step-contract", f"Benchmark step {step.step_id!r} lacks a description, expected artifact, or pass criterion.", "Complete the step contract before running the benchmark."))
+        if step.status == "fail":
+            findings.append(_finding("fail", "benchmark-step-failed", f"Benchmark step {step.step_id!r} failed its pass criterion.", "Fix or rerun the failed step before publication."))
+        elif step.status == "pending":
+            severity: FindingSeverity = "fail" if benchmark.require_all_steps else "warn"
+            findings.append(_finding(severity, "benchmark-step-pending", f"Benchmark step {step.step_id!r} has not been evaluated.", "Evaluate the pending step and attach its observed artifact."))
+        elif not step.observed_artifact:
+            findings.append(_finding("fail", "missing-observed-artifact", f"Benchmark step {step.step_id!r} passed without an observed artifact.", "Attach the artifact that demonstrates the step passed."))
+
+    fact_counts = (
+        benchmark.atomic_facts.supported_count,
+        benchmark.atomic_facts.unsupported_count,
+        benchmark.atomic_facts.contradictory_count,
+        benchmark.atomic_facts.reference_count,
+    )
+    if any(count < 0 for count in fact_counts):
+        findings.append(_finding("fail", "invalid-atomic-fact-count", "Atomic-fact counts cannot be negative.", "Replace negative atomic-fact counts with valid non-negative values."))
+    elif benchmark.atomic_facts.supported_count > benchmark.atomic_facts.reference_count:
+        findings.append(_finding("fail", "invalid-atomic-fact-reference", "Supported atomic facts exceed the reference fact count.", "Correct the reference set or supported-fact count."))
+    else:
+        if benchmark.atomic_facts.contradictory_count > 0:
+            findings.append(_finding("fail", "contradictory-atomic-facts", f"The synthesis contains {benchmark.atomic_facts.contradictory_count} contradictory atomic fact(s).", "Remove or explicitly resolve contradictory facts before publication."))
+        if benchmark.require_no_unsupported and benchmark.atomic_facts.unsupported_count > 0:
+            findings.append(_finding("fail", "unsupported-atomic-facts", f"The synthesis contains {benchmark.atomic_facts.unsupported_count} unsupported atomic fact(s).", "Remove unsupported facts or attach supporting evidence."))
+        if benchmark.atomic_facts.precision < benchmark.precision_floor:
+            findings.append(_finding("fail", "atomic-fact-precision-below-floor", f"Atomic-fact precision {benchmark.atomic_facts.precision:.4f} is below the required floor {benchmark.precision_floor:.4f}.", "Improve factual precision or lower the threshold with documented justification."))
+        if benchmark.atomic_facts.recall < benchmark.recall_floor:
+            findings.append(_finding("fail", "atomic-fact-recall-below-floor", f"Atomic-fact recall {benchmark.atomic_facts.recall:.4f} is below the required floor {benchmark.recall_floor:.4f}.", "Recover missing reference facts or lower the threshold with documented justification."))
+
+    if benchmark.clean_room:
+        allowed_sources = set(benchmark.allowed_source_ids)
+        if not allowed_sources:
+            findings.append(_finding("fail", "missing-clean-room-allowlist", "Clean-room evaluation has no allowed-source manifest.", "Declare the allowed source ids before evaluation."))
+        unidentified_sources = [source for source in manifest.sources if not isinstance(source.get("id"), str) or not source.get("id")]
+        if unidentified_sources:
+            findings.append(_finding("fail", "clean-room-unidentified-source", "Clean-room evaluation contains source records without stable ids.", "Assign stable ids to every accessed source."))
+        disallowed = sorted(known_sources - allowed_sources)
+        if disallowed:
+            findings.append(_finding("fail", "clean-room-source-leakage", f"Clean-room evaluation accessed disallowed source ids: {', '.join(disallowed)}.", "Remove disallowed sources and rerun in a clean environment."))
+
     return findings
 
 
