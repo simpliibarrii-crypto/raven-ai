@@ -14,7 +14,7 @@
 [![Evidence Graphs](https://img.shields.io/badge/Evidence-Graphs-7C4DFF?style=for-the-badge)](docs/EVIDENCE_GRAPH.md)
 [![Token Economy](https://img.shields.io/badge/Token-Economy-FF6D00?style=for-the-badge)](docs/TOKEN_ECONOMY.md)
 
-> **Raven AI** — Open-source, local-first, sovereign agentic platform for biology, healthcare, and reproducible science. Cheap. Fast. Auditable. Built for labs, researchers, clinical teams, and edge deployments.
+> **Raven AI** is an open-source, local-first agentic platform for biology, healthcare, and reproducible science. Efficient. Auditable. Built for researchers, clinical teams, developers, and edge deployments.
 
 ## Table of Contents
 
@@ -38,9 +38,10 @@ pip install raven-ai
 raven serve --port 8000
 ```
 
-Or try the **[Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/bclermo/raven-ai)** — no installation required.
+Or try the **[Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/bclermo/raven-ai)** with no installation required.
 
-**Local dev:**
+**Local development:**
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -50,26 +51,27 @@ pytest -q
 
 ## Why Raven?
 
-Raven delivers **sovereign, local-first, privacy-preserving agentic AI** tailored for biology and healthcare. No cloud lock-in for core flows. Evidence Graphs provide verifiable provenance. Token Economy ensures efficient, measurable, cheap inference with draft-verify-reuse patterns.
+Raven provides local-first, privacy-conscious agent infrastructure tailored for biology and healthcare research. Core workflows can run without cloud lock-in. Evidence Graphs provide provenance, while Token Economy policies support measurable draft, verification, cache, and escalation decisions.
 
-Perfect for:
-- Wet-lab planning & computational biology
-- Clinical evidence workflows & PHI-aware agents
+Designed for:
+
+- Computational biology and protocol review
+- Clinical evidence workflows and PHI-aware agents
 - Reproducible scientific automation
-- Edge / on-device deployments (via Hermes Edge)
-- Desktop orchestration (via Home for AI)
-- Clinical deployment layer (via OpenClinical AI)
+- Edge and on-device deployments through Hermes Edge
+- Desktop orchestration through Home for AI
+- Reviewed clinical deployment workflows through OpenClinical AI
 
 ## Ecosystem Surfaces
 
-| Surface          | Purpose                                      | Repo                          |
-|------------------|----------------------------------------------|-------------------------------|
-| Raven Bio        | Genomics, transcriptomics, proteomics, structural biology, wet-lab planning | raven-ai (core)              |
-| Raven Clinical   | Healthcare evidence, calculators, terminology, PHI-aware workflows | openclinical-ai              |
-| Raven LabOps     | Protocol execution, sample tracking, instrument coordination, audit logs | raven-ai                     |
-| Raven Research   | Literature review, citation verification, hypotheses, reproducible reports | raven-ai                     |
-| Edge Runtime     | GPU-first on-device agents (phones, laptops, edge boxes) | hermes-edge                  |
-| Desktop Orchestration | Local controls, Tauri UI, backend coordination for Raven workflows | home-for-ai             |
+| Surface | Purpose | Repository |
+|---|---|---|
+| Raven Bio | Genomics, transcriptomics, proteomics, structural biology, and protocol review | raven-ai |
+| Raven Clinical | Healthcare evidence, calculators, terminology, and PHI-aware workflows | openclinical-ai |
+| Raven LabOps | Protocol planning, sample tracking contracts, instrument coordination records, and audit logs | raven-ai |
+| Raven Research | Literature review, citation verification, hypotheses, and reproducible reports | raven-ai |
+| Edge Runtime | On-device agents for phones, laptops, and edge systems | hermes-edge |
+| Desktop Orchestration | Local controls, Tauri UI, and backend coordination for Raven workflows | home-for-ai |
 
 ## Visual Architecture & Diagrams
 
@@ -86,7 +88,7 @@ flowchart TD
     Executor -->|Portable Records| HomeForAI[Home for AI]
     Executor -->|Edge Deploy| Hermes[Hermes Edge]
     Executor -->|Clinical Layer| OpenClinical[OpenClinical AI]
-    
+
     style Raven fill:#E3F2FD
     style Evidence fill:#F3E5F5
     style Economy fill:#FFF3E0
@@ -101,7 +103,7 @@ sequenceDiagram
     participant C as Claim Builder
     participant T as Trace Engine
     participant G as Gate Evaluator
-    
+
     Q->>S: Add protocol / paper / observation
     S-->>C: source_id
     C->>C: Build claim with confidence/risk
@@ -127,7 +129,7 @@ flowchart LR
 
 ## Raven Evidence Graph
 
-Raven Evidence Graph is the dependency-free provenance layer for claims, sources, confidence, risk, and answer traces. It gives Raven agents a compact JSON contract that can travel cleanly across OpenClinical AI, Home for AI, Hermes Edge, notebooks, demos, and audit logs.
+Raven Evidence Graph is the dependency-free provenance layer for claims, sources, confidence, risk, and answer traces. It gives Raven agents a compact JSON contract that can travel across OpenClinical AI, Home for AI, Hermes Edge, notebooks, demos, and audit logs.
 
 ```python
 from runtime.evidence_graph import EvidenceGraph
@@ -142,12 +144,14 @@ See [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md) for the data model, scoring
 
 ## Raven Token Economy
 
-Raven studies DSpark's useful token-saving principle without depending on DeepSeek directly: draft cheaply, verify by confidence/risk/evidence, reuse cache, retrieve narrow slices, and escalate only when the cheap draft fails.
+Raven studies DSpark's useful token-saving principle without depending on DeepSeek directly: draft cheaply, verify by confidence, risk, and evidence, reuse cache, retrieve narrow slices, and escalate only when the cheap draft fails.
 
 ```python
 from runtime.token_economy import TokenEconomyRequest, plan_token_economy
 
-plan = plan_token_economy(TokenEconomyRequest(task="public literature synthesis", cache_hit_ratio=0.4))
+plan = plan_token_economy(
+    TokenEconomyRequest(task="public literature synthesis", cache_hit_ratio=0.4)
+)
 print(plan.actions)
 ```
 
@@ -155,18 +159,20 @@ See [docs/TOKEN_ECONOMY.md](docs/TOKEN_ECONOMY.md) for the product policy and [d
 
 ## Scientific Agent Gates
 
-Raven now includes dependency-free scientific run gates that check claim-level evidence labels, reproducibility artifacts, metrics, Token Economy metadata, PHI routing, and public-claim safety before a scientific-agent output is treated as publishable.
+Raven includes dependency-free scientific run gates that check claim-level evidence labels, reproducibility artifacts, metrics, Token Economy metadata, PHI routing, and public-claim safety before a scientific-agent output is treated as publishable.
 
 ```python
 from runtime.scientific_agent_gates import ScientificRunManifest, evaluate_scientific_run
 
-report = evaluate_scientific_run(ScientificRunManifest(
-    run_id="run-001",
-    task_id="bio-task-001",
-    question="What does this run test?",
-    hypothesis="Evidence-linked runs are easier to audit.",
-    workflow_stage="literature_review",
-))
+report = evaluate_scientific_run(
+    ScientificRunManifest(
+        run_id="run-001",
+        task_id="bio-task-001",
+        question="What does this run test?",
+        hypothesis="Evidence-linked runs are easier to audit.",
+        workflow_stage="literature_review",
+    )
+)
 print(report.status)
 ```
 
@@ -174,35 +180,35 @@ See [docs/SCIENTIFIC_AGENT_GATES.md](docs/SCIENTIFIC_AGENT_GATES.md) for the res
 
 ## Ecosystem Operations
 
-See [docs/ECOSYSTEM_OPERATIONS.md](docs/ECOSYSTEM_OPERATIONS.md) for the unified roadmap, repo roles, demo rules, and immediate backlog.
+See [docs/ECOSYSTEM_OPERATIONS.md](docs/ECOSYSTEM_OPERATIONS.md) for the unified roadmap, repository roles, demo rules, and immediate backlog.
 
-## Demo video
+## Demo Video
 
-Watch the clean Raven Evidence Graph demo on X: https://x.com/i/web/status/2074684335639187945
+Watch the Raven Evidence Graph demo on X: https://x.com/i/web/status/2074684335639187945
 
-The video is generated from pure code with no Replit, HeyGen, React Flow, stock, or generator watermark. See [docs/CLEAN_DEMO_VIDEO.md](docs/CLEAN_DEMO_VIDEO.md) and [scripts/render_clean_demo_video.py](scripts/render_clean_demo_video.py).
+The video is generated from code without generator branding. See [docs/CLEAN_DEMO_VIDEO.md](docs/CLEAN_DEMO_VIDEO.md) and [scripts/render_clean_demo_video.py](scripts/render_clean_demo_video.py).
 
 ## Roadmap & Paper
 
-Raven AI is the foundation for a forthcoming paper on **local routing policy, Token Economy, and scientific benchmark contracts** for agentic biology and healthcare AI.
+Raven AI is the foundation for a forthcoming paper on local routing policy, Token Economy, and scientific benchmark contracts for agentic biology and healthcare AI.
 
 - Unified Evidence Graph across all surfaces
 - Production-grade Token Economy with measurable savings
-- Mobile/edge hardening via Hermes Edge
-- Clinical deployment previews via OpenClinical AI
-- Desktop command center via Home for AI
+- Mobile and edge hardening through Hermes Edge
+- Clinical deployment previews through OpenClinical AI
+- Desktop command center through Home for AI
 
 See [ROADMAP.md](ROADMAP.md) for current milestones.
 
 ## Contributing
 
-We welcome contributions that advance sovereign, local-first, auditable agentic systems for science and care!
+Contributions that advance local-first, auditable agentic systems for science and care are welcome.
 
-- Fork the repo
+- Fork the repository
 - Create a feature branch
 - Add tests and Evidence Graph traces for new capabilities
-- Open a PR with clear description of Token Economy impact or gate improvements
-- Join discussions in GitHub Issues or X
+- Open a pull request with a clear description of Token Economy or gate changes
+- Use GitHub Issues for technical discussions and reproducible bug reports
 
 Please read [SECURITY.md](SECURITY.md) and keep clinical claims appropriately scoped.
 
@@ -216,6 +222,4 @@ This project is licensed under the terms in [LICENSE](LICENSE).
 
 ---
 
-**Built with ❤️ for researchers, clinicians, and builders who believe AI for biology and healthcare should be local, verifiable, and under your control.**
-
-Star ⭐ this repo if you value sovereign agentic infrastructure. Share your use cases on X or in Issues — Daddy's little helper is watching and improving every day.
+Built for researchers, clinicians, and developers who want biology and healthcare AI to remain local, verifiable, and reviewable.

@@ -2,7 +2,7 @@
 name = "raven-ai"
 version = "0.1.0"
 description = "Open-source agent platform for biology AI, clinical workflows, and local-first scientific automation"
-authors = [{name = "Barry Clerjuste", email = "bclerjuste@gmail.com"}]
+authors = [{name = "Barry Clerjuste"}]
 license = {text = "Apache-2.0"}
 readme = "README.md"
 requires-python = ">=3.10"
