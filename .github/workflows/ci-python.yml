@@ -39,7 +39,7 @@ jobs:
         id: tests
         run: |
           set -o pipefail
-          pytest -q 2>&1 | tee pytest_findings.txt
+          python -m pytest -q 2>&1 | tee pytest_findings.txt
         continue-on-error: true
       - name: Upload pytest findings
         if: steps.tests.outcome == 'failure'
