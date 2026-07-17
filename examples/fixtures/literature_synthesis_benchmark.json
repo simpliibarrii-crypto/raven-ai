@@ -1,0 +1,52 @@
+{
+  "schema": "raven.scientific_benchmark.v1",
+  "benchmark_id": "literature-synthesis-example-v1",
+  "steps": [
+    {
+      "step_id": "retrieve",
+      "description": "Retrieve the declared papers without accessing sources outside the clean-room allowlist.",
+      "expected_artifact": "artifacts/retrieval_manifest.json",
+      "pass_criterion": "Every accessed source has a stable id present in allowed_source_ids.",
+      "status": "pass",
+      "observed_artifact": "artifacts/retrieval_manifest.json",
+      "notes": "Example only; no clinical-performance claim is implied."
+    },
+    {
+      "step_id": "extract",
+      "description": "Extract independently checkable atomic facts from the allowed papers.",
+      "expected_artifact": "artifacts/atomic_facts.json",
+      "pass_criterion": "Each retained fact links to at least one allowed source id.",
+      "status": "pass",
+      "observed_artifact": "artifacts/atomic_facts.json",
+      "notes": "Unsupported and contradictory facts are excluded from the publishable synthesis."
+    },
+    {
+      "step_id": "synthesize",
+      "description": "Produce the final synthesis from verified atomic facts only.",
+      "expected_artifact": "artifacts/synthesis.md",
+      "pass_criterion": "Atomic-fact precision and recall meet the declared floors with zero contradictions.",
+      "status": "pass",
+      "observed_artifact": "artifacts/synthesis.md",
+      "notes": "The fixture demonstrates the contract, not benchmark performance."
+    }
+  ],
+  "atomic_facts": {
+    "supported_count": 6,
+    "unsupported_count": 0,
+    "contradictory_count": 0,
+    "reference_count": 6,
+    "predicted_count": 6,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "clean_room": true,
+  "allowed_source_ids": [
+    "source:paper-a",
+    "source:paper-b"
+  ],
+  "precision_floor": 0.9,
+  "recall_floor": 0.8,
+  "require_all_steps": true,
+  "require_no_unsupported": true,
+  "notes": "Dependency-free JSON example for a literature-synthesis evaluation run."
+}

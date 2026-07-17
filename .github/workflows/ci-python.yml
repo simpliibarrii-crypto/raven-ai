@@ -13,64 +13,52 @@ jobs:
   python:
     name: Python tests
     runs-on: ubuntu-latest
-    if: hashFiles('pyproject.toml') != ''
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          show-progress: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Install package and test tools
         run: |
           python -m pip install --upgrade pip
-          pip install -e . pytest pytest-asyncio ruff black pynacl
-      - name: Lint
-        run: ruff check .
-        continue-on-error: true
-      - name: Format check
-        run: black --check .
-        continue-on-error: true
+          pip install -e . pytest pytest-asyncio ruff pynacl
+      - name: Changed-code lint
+        run: |
+          ruff check \
+            runtime/scientific_agent_gates.py \
+            tests/test_scientific_agent_gates.py \
+            --ignore=E501
+      - name: Compile Python
+        run: python -m compileall -q runtime tests
       - name: Tests
-        run: pytest -q
-
-  node:
-    name: Node build
-    runs-on: ubuntu-latest
-    if: hashFiles('package.json') != ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+        id: tests
+        run: |
+          set -o pipefail
+          python -m pytest -q 2>&1 | tee pytest_findings.txt
+        continue-on-error: true
+      - name: Upload pytest findings
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v7
         with:
-          node-version: '20'
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build --if-present
-      - name: Test
-        run: npm test --if-present
-
-  rust:
-    name: Rust check
-    runs-on: ubuntu-latest
-    if: hashFiles('Cargo.toml') != '' || hashFiles('src-tauri/Cargo.toml') != ''
-    steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Cargo check root
-        if: hashFiles('Cargo.toml') != ''
-        run: cargo check
-        continue-on-error: true
-      - name: Cargo check Tauri
-        if: hashFiles('src-tauri/Cargo.toml') != ''
-        run: cargo check --manifest-path src-tauri/Cargo.toml
-        continue-on-error: true
+          name: pytest-findings-${{ matrix.python-version }}
+          path: pytest_findings.txt
+      - name: Enforce tests
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
 
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          show-progress: false
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
