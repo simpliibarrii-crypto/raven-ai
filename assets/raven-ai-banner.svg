@@ -1,66 +1,23 @@
-<svg width="1400" height="420" viewBox="0 0 1400 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Raven AI banner</title>
-  <desc id="desc">Dark minimalist Raven AI banner with raven wing geometry and DNA helix motion.</desc>
+<svg width="1400" height="390" viewBox="0 0 1400 390" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Raven AI</title><desc id="desc">Evidence-linked scientific intelligence in the Raven ecosystem.</desc>
   <defs>
-    <radialGradient id="bg" cx="50%" cy="44%" r="82%">
-      <stop offset="0%" stop-color="#241018"/>
-      <stop offset="48%" stop-color="#08090D"/>
-      <stop offset="100%" stop-color="#000000"/>
-    </radialGradient>
-    <linearGradient id="blood" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FF334F"/>
-      <stop offset="42%" stop-color="#C8102E"/>
-      <stop offset="100%" stop-color="#4A0011"/>
-    </linearGradient>
-    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F3F4F6"/>
-      <stop offset="100%" stop-color="#8B949E"/>
-    </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
-      <path d="M34 0H0V34" stroke="#ffffff" stroke-opacity="0.035" stroke-width="1"/>
-    </pattern>
-    <style>
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-      .sans { font-family: Avenir Next, Segoe UI, Helvetica Neue, Arial, sans-serif; }
-      @keyframes drift { from { transform: translateX(-40px); opacity: .08; } 50% { opacity: .22; } to { transform: translateX(40px); opacity: .08; } }
-      @keyframes pulse { 0%,100% { opacity: .28; } 50% { opacity: .72; } }
-      @keyframes wing { 0%,100% { transform: translate(986px,58px) rotate(-1deg); } 50% { transform: translate(986px,58px) rotate(2deg); } }
-      .drift { animation: drift 11s ease-in-out infinite alternate; }
-      .pulse { animation: pulse 3.5s ease-in-out infinite; }
-      .wing { animation: wing 7s ease-in-out infinite; transform-origin: 1060px 190px; }
-      @media (prefers-reduced-motion: reduce) { .drift,.pulse,.wing { animation: none; } }
-    </style>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1140 42) rotate(142) scale(620 490)"><stop stop-color="#35131C"/><stop offset=".5" stop-color="#0D0D0F"/><stop offset="1" stop-color="#050505"/></radialGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F04460"/><stop offset="1" stop-color="#8A1528"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E7D3AF"/><stop offset="1" stop-color="#756347"/></linearGradient>
+    <pattern id="grid" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M38 0H0V38" stroke="#FFFFFF" stroke-opacity=".035"/></pattern>
   </defs>
-  <rect width="1400" height="420" fill="url(#bg)"/>
-  <rect width="1400" height="420" fill="url(#grid)"/>
-  <g opacity="0.42">
-    <path d="M-40 346 C180 276, 296 410, 526 324 S870 256, 1440 352" stroke="#8B949E" stroke-opacity="0.18"/>
-    <path d="M-30 86 C176 156, 310 24, 542 94 S928 172, 1440 58" stroke="#C8102E" stroke-opacity="0.30"/>
-  </g>
-  <g class="drift" opacity="0.55" stroke="#C8102E" stroke-width="2" filter="url(#glow)">
-    <path d="M154 60 C242 118, 74 172, 162 230 C250 288, 82 338, 172 392"/>
-    <path d="M246 60 C158 118, 326 172, 238 230 C150 288, 318 338, 228 392"/>
-    <g opacity="0.75">
-      <line x1="165" y1="88" x2="235" y2="88"/><line x1="132" y1="128" x2="268" y2="128"/>
-      <line x1="145" y1="169" x2="255" y2="169"/><line x1="155" y1="210" x2="245" y2="210"/>
-      <line x1="145" y1="252" x2="255" y2="252"/><line x1="132" y1="294" x2="268" y2="294"/>
-      <line x1="166" y1="338" x2="234" y2="338"/>
-    </g>
-  </g>
-  <g class="wing" opacity="0.78">
-    <path d="M72 26 C158 48 196 108 180 176 C238 156 314 180 352 258 C292 226 224 238 160 320 C172 232 132 184 64 148 C118 136 132 78 72 26Z" fill="url(#blood)"/>
-    <path d="M118 104 C162 110 178 142 156 172 C190 166 226 184 244 220 C203 201 166 210 126 256 C138 206 108 176 68 160 C110 152 126 130 118 104Z" fill="#05060A" fill-opacity="0.72"/>
-    <circle class="pulse" cx="146" cy="113" r="6" fill="#F4F4F5"/>
-  </g>
-  <g transform="translate(118 106)">
-    <text class="mono" x="0" y="0" fill="#8B949E" font-size="16" letter-spacing="5">OPEN-SOURCE RESEARCH INFRASTRUCTURE</text>
-    <text class="sans" x="0" y="74" fill="#F4F4F5" font-size="66" font-weight="800" letter-spacing="3">RAVEN AI</text>
-    <text class="sans" x="3" y="124" fill="#D0D7DE" font-size="26" letter-spacing="1.5">agentic ai · computational biology · healthcare systems</text>
-    <rect x="4" y="154" width="510" height="3" fill="url(#blood)"/>
-    <text class="mono" x="4" y="198" fill="#9DA7B3" font-size="18">local-first where possible · cloud-optional where necessary · evidence-linked by design</text>
+  <rect width="1400" height="390" rx="28" fill="url(#bg)"/><rect width="1400" height="390" rx="28" fill="url(#grid)"/><rect x="1" y="1" width="1398" height="388" rx="27" stroke="#FFFFFF" stroke-opacity=".08"/>
+  <text x="78" y="78" fill="#C8273F" font-family="ui-monospace, monospace" font-size="13" letter-spacing="4">RAVEN ECOSYSTEM / SCIENTIFIC INTELLIGENCE CORE</text>
+  <text x="78" y="174" fill="#F4EFE7" font-family="Georgia, serif" font-size="72" font-weight="600">Raven AI</text>
+  <text x="80" y="225" fill="#C9AD7D" font-family="Avenir Next, Segoe UI, Arial, sans-serif" font-size="27">Evidence-linked scientific intelligence.</text>
+  <line x1="80" y1="260" x2="695" y2="260" stroke="url(#red)" stroke-width="3"/>
+  <text x="80" y="303" fill="#8F8A83" font-family="ui-monospace, monospace" font-size="15" letter-spacing="1">PROVENANCE  ·  TOKEN ECONOMY  ·  SCIENTIFIC GATES</text>
+  <g transform="translate(1010 48)">
+    <circle cx="150" cy="145" r="124" stroke="#C9AD7D" stroke-opacity=".14"/><circle cx="150" cy="145" r="68" fill="#09090A" stroke="#C8273F" stroke-opacity=".7"/>
+    <circle cx="150" cy="145" r="8" fill="#F04460"/>
+    <g fill="#C9AD7D"><circle cx="54" cy="83" r="6"/><circle cx="244" cy="72" r="6"/><circle cx="258" cy="208" r="6"/><circle cx="74" cy="230" r="6"/></g>
+    <g stroke="url(#gold)" stroke-opacity=".48"><path d="M59 86L139 137"/><path d="M239 76L160 136"/><path d="M252 204L161 153"/><path d="M79 226L140 154"/></g>
+    <path d="M150 77C201 99 208 154 173 187C153 205 125 200 105 181C71 148 82 102 150 77Z" fill="url(#red)" fill-opacity=".34"/>
+    <text x="150" y="311" text-anchor="middle" fill="#8F8A83" font-family="ui-monospace, monospace" font-size="11" letter-spacing="2">ACTIVE RESEARCH PLATFORM</text>
   </g>
 </svg>
