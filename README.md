@@ -48,23 +48,36 @@ flowchart LR
     style Output fill:#151518,stroke:#78D7A0,color:#F4EFE7
 ```
 
-## Quick start
+## Tested development paths
+
+Clone and run the automated test suite:
 
 ```bash
-pip install raven-ai
-raven serve --port 8000
-```
-
-Local development:
-
-```bash
+git clone https://github.com/simpliibarrii-crypto/raven-ai.git
+cd raven-ai
 python -m venv .venv
 source .venv/bin/activate
-pip install -e . pytest pynacl
+pip install -e ".[dev]"
 pytest -q
 ```
 
-Try the **[Hugging Face demonstration](https://huggingface.co/spaces/bclermo/raven-ai)** without installing the package.
+Run the current FastAPI development runtime:
+
+```bash
+pip install -e ".[dev]"
+python -m uvicorn runtime.server:app --host 127.0.0.1 --port 8000
+```
+
+Run the public workflow demonstration locally:
+
+```bash
+pip install -e ".[space]"
+python space_app.py
+```
+
+The project does not currently register a `raven` command-line executable, and this repository does not claim a published container image. Documentation should use the commands above until those distribution surfaces are implemented and tested.
+
+Try the **[Hugging Face demonstration](https://huggingface.co/spaces/bclermo/raven-ai)** without installing the package. It is a deterministic workflow demonstration, not live database retrieval, medical guidance, or proof of trained-model performance.
 
 ## Ecosystem surfaces
 
@@ -100,6 +113,7 @@ A workflow should not become publishable merely because an agent completed it. R
 - Do not use the platform to bypass biosafety, privacy, consent, or human-review requirements.
 - Keep source attribution intact and mark engineering inference separately from demonstrated research findings.
 - Record device, model, runtime, and benchmark context before making performance claims.
+- Do not claim deployments, customers, integrations, package releases, or container images without reproducible public evidence.
 
 ## Contributing
 
