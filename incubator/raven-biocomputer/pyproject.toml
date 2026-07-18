@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "raven-biocomputer-incubator"
+version = "0.1.0"
+description = "Incubator seed for a private, auditable biology workstation for AI agents."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+space = ["gradio>=5,<7"]
+dev = ["pytest>=8.3,<10"]
+
+[tool.setuptools]
+py-modules = ["raven_biocomputer"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
