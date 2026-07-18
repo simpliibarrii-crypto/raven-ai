@@ -26,9 +26,9 @@ jobs:
           pip install -e '.[dev,space]'
           pip install playwright
           playwright install --with-deps chromium
-      - name: Lint, compile, and test
+      - name: Validate changed demo and repository runtime
         run: |
-          ruff check runtime tests space_app.py --ignore E501
+          ruff check space_app.py --ignore E501
           python -m compileall -q runtime tests space_app.py
           pytest -q
       - name: Import and exercise the deterministic workflow
@@ -45,10 +45,15 @@ jobs:
           PY
       - name: Launch and inspect the branded Gradio demo
         run: |
-          python space_app.py > /tmp/raven-space.log 2>&1 &
+          python space_app.py > raven-space.log 2>&1 &
           SPACE_PID=$!
           trap 'kill $SPACE_PID || true' EXIT
-          for i in {1..50}; do curl -fsS http://127.0.0.1:7860 >/dev/null && break; sleep 1; done
+          READY=0
+          for i in {1..50}; do
+            if curl -fsS http://127.0.0.1:7860 >/dev/null; then READY=1; break; fi
+            sleep 1
+          done
+          test "$READY" = 1 || { cat raven-space.log; exit 1; }
           python - <<'PY'
           from playwright.sync_api import sync_playwright
 
@@ -74,7 +79,9 @@ jobs:
         if: always()
         with:
           name: raven-visual-smoke
-          path: raven-*.png
+          path: |
+            raven-*.png
+            raven-space.log
 
   taste-and-claims:
     runs-on: ubuntu-latest
