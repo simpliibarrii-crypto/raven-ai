@@ -1,7 +1,7 @@
 [project]
 name = "raven-ai"
 version = "0.1.0"
-description = "Open-source agent platform for biology AI, clinical workflows, and local-first scientific automation"
+description = "Evidence-linked agent platform for scientific workflows, healthcare research, and local-first automation"
 authors = [{name = "Barry Clerjuste", email = "bclerjuste@gmail.com"}]
 license = {text = "Apache-2.0"}
 readme = "README.md"
@@ -19,6 +19,22 @@ dependencies = [
     "pynacl>=1.5,<1.6",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+]
+space = [
+    "gradio>=5,<7",
+]
+
+[project.urls]
+Homepage = "https://simpliibarrii-crypto.github.io/project.html?project=raven-ai"
+Research = "https://simpliibarrii-crypto.github.io/research.html"
+Repository = "https://github.com/simpliibarrii-crypto/raven-ai"
+Demo = "https://huggingface.co/spaces/bclermo/raven-ai"
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
@@ -29,3 +45,10 @@ include = ["runtime*", "registry*", "audit_gateway*", "consent*", "fhir*", "psw_
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.yaml", "*.yml", "*.html", "*.css", "*.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
