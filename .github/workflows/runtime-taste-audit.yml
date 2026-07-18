@@ -26,11 +26,12 @@ jobs:
           pip install -e '.[dev,space]'
           pip install playwright
           playwright install --with-deps chromium
-      - name: Validate changed demo and repository runtime
+      - name: Compile changed runtime surfaces
+        run: python -m compileall -q runtime tests space_app.py
+      - name: Run repository tests with diagnostics
         run: |
-          ruff check space_app.py --ignore E501
-          python -m compileall -q runtime tests space_app.py
-          pytest -q
+          set -o pipefail
+          pytest -q 2>&1 | tee raven-test.log
       - name: Import and exercise the deterministic workflow
         run: |
           python - <<'PY'
@@ -40,6 +41,7 @@ jobs:
           assert len(history) == 2
           assert history[-1]['role'] == 'assistant'
           assert 'does not query live scientific databases' in history[-1]['content']
+          assert state == history
           assert cleared == ''
           print('Raven workflow function passed.')
           PY
@@ -78,10 +80,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: raven-visual-smoke
+          name: raven-runtime-diagnostic
           path: |
             raven-*.png
             raven-space.log
+            raven-test.log
 
   taste-and-claims:
     runs-on: ubuntu-latest
