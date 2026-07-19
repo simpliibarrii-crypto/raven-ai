@@ -110,7 +110,7 @@ def respond(message: str, workflow: str, history: list[dict] | None):
     return history, history, ""
 
 
-with gr.Blocks(title="Raven AI — Evidence-linked Scientific Intelligence", css=BRAND_CSS) as app:
+with gr.Blocks(title="Raven AI — Evidence-linked Scientific Intelligence") as app:
     gr.HTML(
         """
         <section class="raven-hero">
@@ -131,7 +131,7 @@ with gr.Blocks(title="Raven AI — Evidence-linked Scientific Intelligence", css
     summary = gr.HTML(value=workflow_summary("Raven Research"))
     workflow.change(workflow_summary, inputs=workflow, outputs=summary)
 
-    chatbot = gr.Chatbot(type="messages", height=430, label="Evidence workflow")
+    chatbot = gr.Chatbot(height=430, label="Evidence workflow")
     message = gr.Textbox(
         placeholder="Describe a research or workflow question...",
         label="Question",
@@ -148,4 +148,4 @@ with gr.Blocks(title="Raven AI — Evidence-linked Scientific Intelligence", css
 
 
 if __name__ == "__main__":
-    app.launch()
+    app.launch(css=BRAND_CSS)

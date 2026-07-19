@@ -1,0 +1,121 @@
+name: Runtime and Taste Audit
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-and-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project and visual test tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev,space]'
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Compile changed runtime surfaces
+        run: python -m compileall -q runtime tests examples space_app.py
+      - name: Run repository tests with diagnostics
+        run: |
+          set -o pipefail
+          pytest -q 2>&1 | tee raven-test.log
+      - name: Import and exercise the deterministic workflow
+        run: |
+          set -o pipefail
+          python - <<'PY' 2>&1 | tee raven-import.log
+          import space_app
+          assert space_app.app is not None
+          history, state, cleared = space_app.respond(
+              'Review a public evidence packet.',
+              'Raven Research',
+              [],
+          )
+          assert len(history) == 2
+          assert history[-1]['role'] == 'assistant'
+          assert 'does not query live scientific databases' in history[-1]['content']
+          assert state == history
+          assert cleared == ''
+          print('Raven workflow function passed.')
+          PY
+      - name: Launch and inspect the branded Gradio demo
+        run: |
+          python -u space_app.py > raven-space.log 2>&1 &
+          SPACE_PID=$!
+          trap 'kill $SPACE_PID || true' EXIT
+          READY=0
+          for i in {1..50}; do
+            if curl -fsS http://127.0.0.1:7860 >/dev/null; then READY=1; break; fi
+            sleep 1
+          done
+          test "$READY" = 1 || { cat raven-space.log; exit 1; }
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+
+          errors = []
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              for name, viewport in [('desktop', {'width': 1440, 'height': 1000}), ('mobile', {'width': 390, 'height': 844})]:
+                  page = browser.new_page(viewport=viewport)
+                  page.on('console', lambda msg, n=name: errors.append(f'{n}: {msg.text}') if msg.type == 'error' else None)
+                  page.on('pageerror', lambda exc, n=name: errors.append(f'{n}: {exc}'))
+                  page.goto('http://127.0.0.1:7860', wait_until='networkidle')
+                  page.get_by_text('Raven AI', exact=False).first.wait_for()
+                  text = page.locator('body').inner_text()
+                  assert 'ACTIVE RESEARCH PLATFORM' in text
+                  assert 'Public workflow demonstration' in text
+                  page.screenshot(path=f'raven-{name}.png', full_page=True)
+                  page.close()
+              browser.close()
+          if errors:
+              raise AssertionError('Browser errors:\n' + '\n'.join(errors))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: raven-runtime-diagnostic
+          path: |
+            raven-*.png
+            raven-space.log
+            raven-test.log
+            raven-import.log
+
+  taste-and-claims:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce the brand and claims boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          demo = Path('space_app.py').read_text(encoding='utf-8').lower()
+          readme = Path('README.md').read_text(encoding='utf-8').lower()
+          for token in ('#050505', '#c8273f', '#c9ad7d', '#f4efe7'):
+              assert token in demo, f'missing canonical brand token {token}'
+          forbidden = [
+              'already deployed at gary j armstrong',
+              'docker pull simpliibarrii-crypto/raven-ai',
+              'raven serve --port',
+              'raven research "your query"',
+              'theme=gr.themes.soft',
+          ]
+          for phrase in forbidden:
+              assert phrase not in demo + readme, f'unsupported or legacy claim returned: {phrase}'
+          assert 'if __name__ == "__main__"' in demo
+          assert 'active research platform' in demo + readme
+          assert 'does not claim autonomous scientific authority' in readme
+          print('Raven taste and claims contract passed.')
+          PY
