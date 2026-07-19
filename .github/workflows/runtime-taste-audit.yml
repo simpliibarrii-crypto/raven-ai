@@ -52,7 +52,7 @@ jobs:
           PY
       - name: Launch and inspect the branded Gradio demo
         run: |
-          python space_app.py > raven-space.log 2>&1 &
+          python -u space_app.py > raven-space.log 2>&1 &
           SPACE_PID=$!
           trap 'kill $SPACE_PID || true' EXIT
           READY=0
