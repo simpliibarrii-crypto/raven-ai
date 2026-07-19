@@ -27,17 +27,22 @@ jobs:
           pip install playwright
           playwright install --with-deps chromium
       - name: Compile changed runtime surfaces
-        run: python -m compileall -q runtime tests space_app.py
+        run: python -m compileall -q runtime tests examples space_app.py
       - name: Run repository tests with diagnostics
         run: |
           set -o pipefail
           pytest -q 2>&1 | tee raven-test.log
       - name: Import and exercise the deterministic workflow
         run: |
-          python - <<'PY'
+          set -o pipefail
+          python - <<'PY' 2>&1 | tee raven-import.log
           import space_app
           assert space_app.app is not None
-          history, state, cleared = space_app.respond('Review a public evidence packet.', 'Raven Research', [])
+          history, state, cleared = space_app.respond(
+              'Review a public evidence packet.',
+              'Raven Research',
+              [],
+          )
           assert len(history) == 2
           assert history[-1]['role'] == 'assistant'
           assert 'does not query live scientific databases' in history[-1]['content']
@@ -85,6 +90,7 @@ jobs:
             raven-*.png
             raven-space.log
             raven-test.log
+            raven-import.log
 
   taste-and-claims:
     runs-on: ubuntu-latest
